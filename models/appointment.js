@@ -1,0 +1,40 @@
+module.exports = (sequelize, DataTypes) => {
+    const Appointment = sequelize.define('Appointments',{
+        id: {
+            type: DataTypes.UUID,
+            defaultValue: DataTypes.UUIDV4,
+            primaryKey: true
+        },
+        remoteappointment: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false
+        },
+        onsiteappointment: {
+            type: DataTypes.BOOLEAN,
+            allowNull: false
+        },
+        date: {
+            type: DataTypes.DATE,
+            allowNull:true
+        },
+        roomid: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        price: {
+            type: DataTypes.FLOAT,
+            allowNull: false,
+        }
+    });
+
+    Appointment.associate = db => {
+        db.Appointments.belongsTo(db.Patients, {
+            onDelete: 'CASCADE'
+        });
+        db.Appointments.belongsTo(db.Doctors, {
+            onDelete: 'CASCADE'
+        });
+    }
+
+    return Appointment;
+}
