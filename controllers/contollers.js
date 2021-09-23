@@ -153,10 +153,19 @@ exports.callHandshake = (req,res) => {
         socket.emit('ownuser', socket.id); //as soon client makes a request to connect with the server, a socket is created, and here we handover this client socket.id with the emit() function
         
         socket.on('disconnect',() => {
-            socket.broadcast.emit("call ended"); //all users will be notified that the call has been terminated
+            console.log('disconnected');
+            socket.broadcast.emit("callended"); //all users will be notified that the call has been terminated
         });
 
-        socket.on('call',({destinationUser,signallingData,senderUser,senderName}))
+        socket.on('call',({destinationUser,signallingData,senderUser,senderName}) => {
+            console.log('going to call');
+            io.to(destinationUser).emit("calluser",{signal: signallingData, senderUser,senderName});
+        });
+
+        socket.on('answer', (data) => {
+            console.log('going to answer');
+            io.to(data.callerId).emit("callaccepted", data.signaldata);
+        });
     })
 }
 

@@ -6,6 +6,8 @@ router.get('/',(req,res) => {
     res.status(200).send({text: 'all good'});
 })
 
+//DATABASE ROUTES
+
 // get doctor appointments
 router.get('/doctor/:id/appointments', controller.getDoctorAppointments);
 
@@ -26,6 +28,17 @@ router.post('/doctor', controller.addDoctor)
 
 // create a appointment
 router.post('/appointment', controller.addAppointment)
+
+// Signalling Server routes
+router.post('/call', (req,res) => {
+    res.redirect()
+})
+
+// chat room
+router.get('')
+
+// payments
+
 
 
 module.exports = router;
