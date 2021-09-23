@@ -34,7 +34,7 @@ module.exports = (sequelize, DataTypes) => {
             allowNull:false
         },
         location: {
-            type: DataTypes.GEOMETRY('POINT',4326),
+            type: DataTypes.GEOMETRY('POINT', 4326),
             allowNull: false
         },
         priceremote: {

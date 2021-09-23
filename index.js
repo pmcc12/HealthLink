@@ -10,9 +10,14 @@ const io = require('socket.io')(server,{
 const cors = require('cors');
 const bodyParser = require('body-parser');
 const db = require('./models/model')
+const router = require('./router');
 require('dotenv').config(); 
 
 const {devPORT} = process.env || 5000;
+
+app.use(cors());
+app.use(bodyParser.json());
+app.use(router);
 
 (async function bootstrap() {
     await db.sequelize.sync();
