@@ -6,6 +6,9 @@ router.get('/',(req,res) => {
     res.status(200).send({text: 'all good'});
 })
 
+// get doctor appointments
+router.get('/doctor/:id/appointments', controller.getDoctorAppointments);
+
 // get a patient by id
 router.get('/patient/:id', controller.getPatient)
 
@@ -22,8 +25,7 @@ router.post('/patient', controller.addPatient)
 router.post('/doctor', controller.addDoctor)
 
 // create a appointment
-router.post('/appointment', (req, res) => {
+router.post('/appointment', controller.addAppointment)
 
-})
 
 module.exports = router;

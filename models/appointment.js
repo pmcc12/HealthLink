@@ -29,11 +29,12 @@ module.exports = (sequelize, DataTypes) => {
 
     Appointment.associate = db => {
         db.Appointments.belongsTo(db.Patients, {
-            onDelete: 'CASCADE'
+            onDelete: 'CASCADE',
         });
         db.Appointments.belongsTo(db.Doctors, {
-            onDelete: 'CASCADE'
+            onDelete: 'CASCADE',
         });
+
     }
 
     return Appointment;

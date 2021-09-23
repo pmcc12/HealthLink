@@ -17,9 +17,14 @@ const {devPORT} = process.env || 5000;
 
 app.use(cors());
 app.use(bodyParser.json());
+app.use((req,res,next) => {
+    req.server = server;
+    next();
+})
 app.use(router);
 
 (async function bootstrap() {
+    //    await db.sequelize.sync({force:true}); drop all tables and create again
     await db.sequelize.sync();
     server.listen(devPORT, () => {
         console.log('Server and DB Operating in port ',devPORT);

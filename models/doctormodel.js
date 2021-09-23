@@ -38,12 +38,12 @@ module.exports = (sequelize, DataTypes) => {
             allowNull: false
         },
         priceremote: {
-            field:'price_remote',
+            // field:'price_remote',
             type: DataTypes.FLOAT,
             allowNull: false
         },
         priceonsite: {
-            field:'price_on_site',
+            // field:'price_on_site',
             type: DataTypes.FLOAT,
             allowNull: false
         },
@@ -54,7 +54,9 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     Doctor.associate = db => {
-        db.Doctors.belongsToMany(db.Patients, {through: "Appointments", foreignKey: "doctor_id"});
+        db.Doctors.belongsToMany(db.Patients, {through: "Appointments"});
+        // db.Doctors.(db.Appointments, {foreignKey: "Appointments"});
+
     }
 
     return Doctor;
