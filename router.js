@@ -30,12 +30,7 @@ router.post('/doctor', controller.addDoctor)
 router.post('/appointment', controller.addAppointment)
 
 // Signalling Server routes
-router.post('/call', (req,res) => {
-    res.redirect()
-})
-
-// chat room
-router.get('')
+router.post('/', controller.callHandshake)
 
 // payments
 

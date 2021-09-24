@@ -144,14 +144,18 @@ exports.getDoctorAppointments = async (req,res) => {
 exports.callHandshake = (req,res) => {
     const io = require('socket.io')(req.server,{
         cors : {
-            origin: "http://localhost:3000", //we might need to change, when front end is deployed in netlify
+            origin: "*", //we might need to change, when front end is deployed in netlify
             methods: ["GET","POST"]
         }
     });
 
+    console.log('here in callhandshake!')
+
     io.on('connection', (socket) => {
         socket.emit('ownuser', socket.id); //as soon client makes a request to connect with the server, a socket is created, and here we handover this client socket.id with the emit() function
         
+        console.log('connection established');
+
         socket.on('disconnect',() => {
             console.log('disconnected');
             socket.broadcast.emit("callended"); //all users will be notified that the call has been terminated

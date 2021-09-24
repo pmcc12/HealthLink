@@ -1,12 +1,13 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
-import './index.css';
+import { CallContextProvider } from './context/CallContext';
 import App from './App';
+import './index.css';
 
 ReactDOM.render(
-  <React.StrictMode>
+  <CallContextProvider>
     <App />
-  </React.StrictMode>,
+  </CallContextProvider>,
   document.getElementById('root')
 );
 
