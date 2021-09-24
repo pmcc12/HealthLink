@@ -1,8 +1,9 @@
 import {useRef, useState} from 'react'
-import { Button } from "@material-ui/core";
+import { Button, Container } from "@material-ui/core";
 import VideoChat from './components/VideoChat';
 import Options from './components/Options';
 import Notifications from './components/Notification';
+import { CallContextProvider } from './context/CallContext';
 
 const App = () => {
 
@@ -11,21 +12,22 @@ const App = () => {
   const toggle = () => {
     const buffer = videoCall;
     setvideoCall(!buffer);
+    console.log(videoCall);
   } ;
 
   return (
     <div className="App">
-     {/* <Button onClick={toggle}>toggle videochat</Button>
-     {console.log(videoCall)}
-     {videoCall & (
-      <div> */}
-        <VideoChat />
-        <Options>
-          <Notifications />
-        </Options>    
-      {/* </div>         
-     )
-     } */}
+     <Button onClick={toggle}>toggle videochat</Button>
+     <Container>
+      {videoCall ? (
+      <CallContextProvider>
+          <VideoChat />
+          <Options>
+            <Notifications />
+          </Options>
+      </CallContextProvider>
+      ) : null}
+      </Container>      
     </div>
   );
 }

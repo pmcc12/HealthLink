@@ -5,9 +5,10 @@ import App from './App';
 import './index.css';
 
 ReactDOM.render(
-  <CallContextProvider>
+  // <CallContextProvider>
     <App />
-  </CallContextProvider>,
+  // </CallContextProvider>
+  ,
   document.getElementById('root')
 );
 
