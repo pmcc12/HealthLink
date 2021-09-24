@@ -4,6 +4,7 @@ import VideoChat from './components/VideoChat';
 import Options from './components/Options';
 import Notifications from './components/Notification';
 import { CallContextProvider } from './context/CallContext';
+// import myMap from './components/Map';
 
 const App = () => {
 
@@ -17,17 +18,17 @@ const App = () => {
 
   return (
     <div className="App">
-     <Button onClick={toggle}>toggle videochat</Button>
+     <Button onClick={toggle}>toggle videochat</Button> 
      <Container>
       {videoCall ? (
-      <CallContextProvider>
+        <CallContextProvider>
           <VideoChat />
           <Options>
             <Notifications />
           </Options>
-      </CallContextProvider>
-      ) : null}
-      </Container>      
+        </CallContextProvider>
+       ) : null}
+       </Container>          
     </div>
   );
 }

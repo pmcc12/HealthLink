@@ -4,26 +4,31 @@ import Peer from 'simple-peer'
 
 const CallContext = createContext();
 
-const socket = io('http://localhost:8080/');
 
 //context will be available to all children who can have rights of access to calling data
 
 export const CallContextProvider = ({children}) => {
+    
+    // const socket = io('http://localhost:8080/');
 
+    
+    const [socket] = useState(io('http://localhost:8080/'))
     const [stream, setStream] = useState(null);
     const [me, setMe] = useState('');
     const [call, setCall] = useState({});
     const [callAccepted, setCallAccepted] = useState(false);
     const [callEnded, setCallEnded] = useState(false);
     const [name, setName] = useState('');
-
+    
     const myVideo = useRef({}); //is a html video element with my video
     const userVideo = useRef({}); //is a html video element with my video
-    const connectionRef = useRef({});
-
+    const connectionRef = useRef({}); //need a reference outside this function for when i want to destroy the call
+    
     //context is created so that children components at any point can access to state and inner methods
-
+    
     useEffect(() => {
+        
+
         navigator.mediaDevices.getUserMedia({
             video: true,
             audio:true
@@ -33,8 +38,14 @@ export const CallContextProvider = ({children}) => {
             myVideo.current.srcObject = incomingStream;
         });
 
+        console.log('it starts!');
+        
         //saves my socket.id (created by the signalling server). listening since beginning
-        socket.on('ownuser', (id) => {setMe(id)});
+        
+        socket.on('ownuser', (id) => {
+            console.log('got it!');    
+            setMe(id)
+        });
 
         //this particular event is received by the user that is receiving the call (callee) (with the data from the user trying to establish connection forwarded by the signalling server)
         //event 'call' originated from the signalling server
@@ -81,7 +92,7 @@ export const CallContextProvider = ({children}) => {
             setCallAccepted(true); //for conditional rendering.. if accepted than we will show callee window
             callerPeer.signal(signal); //final handshaking is done here. Trying p2p connection
         });
-
+        //need a reference outside this function for when i want to destroy the call
         connectionRef.current = callerPeer;
     };
 
@@ -114,10 +125,13 @@ export const CallContextProvider = ({children}) => {
         //callee attempts to establish p2p connection with caller.. only will be achieved after caller received the signalling data sent on line 92 via websockets
         calleePeer.signal(call.signal);
 
+         //need a reference outside this function for when i want to destroy the call
         connectionRef.current = calleePeer;
     }
 
     const endCall = () => {
+
+        console.log('call ended!');
         setCallEnded(true);
 
         connectionRef.current.destroy();

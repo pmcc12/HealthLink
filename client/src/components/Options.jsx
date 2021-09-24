@@ -37,7 +37,7 @@ const useStyles = makeStyles((theme) => ({
   }));
 
   const Options = ({children}) => {
-    const {me, callAccepted, name, setName, callEnded,leaveCall, callUser} = useCall();
+    const {me, callAccepted, name, setName, callEnded,endCall, callUser} = useCall();
     //the id we want to call
     const [idToCall, setIdToCall] = useState('');
     const classes = useStyles();
@@ -52,17 +52,17 @@ const useStyles = makeStyles((theme) => ({
                             <Typography gutterBottom variant="h6">Account Info</Typography>
                             <TextField label="Name" value={name} onChange={(event) => setName(event.target.value)}/>
                             {console.log(me)}
-                            <CopyToClipboard text={me} className={classes.margin}>
+                            {/* <CopyToClipboard text={me} className={classes.margin}>
                                 <Button variant="container" color="primary" fullWidth startIcon={<Assignment fontSize="large"/>}>
                                     Copy your ID
                                 </Button>
-                            </CopyToClipboard>
+                            </CopyToClipboard> */}
                         </Grid>
                         <Grid item xs={12} md={6} className={classes.padding}>
                             <Typography gutterBottom variant="h6">Make a Call</Typography>
                             <TextField label="ID to Call" value={idToCall} onChange={(event) => setIdToCall(event.target.value)}/>
                             {callAccepted && !callEnded ? (
-                                <Button onClick={leaveCall} className={classes.margin} variant="contained" color="secondary" fullWidth startIcon={<PhoneDisabled fontSize="large"/>}>
+                                <Button onClick={endCall} className={classes.margin} variant="contained" color="secondary" fullWidth startIcon={<PhoneDisabled fontSize="large"/>}>
                                     Hang Up
                                 </Button>
                             ) : (
