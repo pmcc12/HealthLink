@@ -3,10 +3,25 @@ import { Button, Container } from "@material-ui/core";
 import VideoChat from './components/VideoChat';
 import Options from './components/Options';
 import Notifications from './components/Notification';
+import MarkerMap from './components/MarkerMap';
 import { CallContextProvider } from './context/CallContext';
+import { makeStyles } from '@material-ui/core/styles';
+const useStyles = makeStyles((theme) => ({
+  container: {
+    width: '600px',
+    margin: '35px 0',
+    padding: 0,
+    [theme.breakpoints.down('xs')]: {
+      width: '80%',
+    }
+  }
+}));
+
 // import myMap from './components/Map';
 
 const App = () => {
+
+  const classes = useStyles();
 
   const [videoCall, setvideoCall] = useState(false);
 
@@ -28,7 +43,10 @@ const App = () => {
           </Options>
         </CallContextProvider>
        ) : null}
-       </Container>          
+     </Container>
+     <Container className={classes.container}>
+      <MarkerMap />
+     </Container>      
     </div>
   );
 }

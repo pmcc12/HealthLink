@@ -15,6 +15,8 @@ require('dotenv').config();
 
 const {devPORT} = process.env || 5000;
 
+console.log(process.env);
+
 app.use(cors());
 app.use(bodyParser.json())
    .use(router);
