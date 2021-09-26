@@ -18,3 +18,17 @@ code {
   width: 500px;
   height: 350px;
 }
+
+.doctor-popup ul {
+  list-style: none;
+  padding: 0px;
+  margin: 0px;
+}
+
+.doctor-popup li {
+  margin-bottom: 0.4em;
+}
+
+.doctor-popup li:last-child {
+  margin-bottom: 0;
+}

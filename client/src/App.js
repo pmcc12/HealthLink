@@ -6,6 +6,9 @@ import Notifications from './components/Notification';
 import MarkerMap from './components/MarkerMap';
 import { CallContextProvider } from './context/CallContext';
 import { makeStyles } from '@material-ui/core/styles';
+import SignInSide from './components/EntrySignIn';
+import SignUp from './components/SignUp'
+
 const useStyles = makeStyles((theme) => ({
   container: {
     width: '600px',
@@ -33,7 +36,7 @@ const App = () => {
 
   return (
     <div className="App">
-     <Button onClick={toggle}>toggle videochat</Button> 
+     {/* <Button onClick={toggle}>toggle videochat</Button> 
      <Container>
       {videoCall ? (
         <CallContextProvider>
@@ -46,7 +49,9 @@ const App = () => {
      </Container>
      <Container className={classes.container}>
       <MarkerMap />
-     </Container>      
+     </Container>       */}
+     <SignInSide />
+     <SignUp />
     </div>
   );
 }
