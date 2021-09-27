@@ -5,6 +5,11 @@ module.exports = (sequelize, DataTypes) => {
             defaultValue: DataTypes.UUIDV4,
             primaryKey: true
         },
+        isdoctor: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false,
+            allowNull: true
+        },
         name: {
             type: DataTypes.STRING,
             allowNull: false

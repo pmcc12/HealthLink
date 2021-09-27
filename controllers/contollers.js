@@ -1,5 +1,5 @@
 const db = require('./../models/model');
-
+const bcrypt = require('bcrypt');
 //get all doctors
 exports.getAllDoctors = async (req,res) => {
     try {
@@ -12,6 +12,52 @@ exports.getAllDoctors = async (req,res) => {
     } catch(err){
         res.status(500).send('Error!');
     }
+}
+
+exports.login = async (req,res) => {
+    try{
+        console.log('in login')
+        const {email, password} = req.body;
+        console.log(email,' ',password);
+        const userPatient = await db.Patients.findOne({where:{ email: email }});
+        console.log(userPatient)
+        const userDoctor = await db.Doctors.findOne({where:{ email: email }});
+        console.log(userDoctor);
+        if (userPatient){
+            const passValidation = await bcrypt.compare(password,userPatient.password);
+            if(!passValidation){
+                throw new Error();
+            }
+            req.session.uid = userPatient._id;
+            res.status(200).send(userPatient);
+        }else if(userDoctor){
+            const passValidation = await bcrypt.compare(password,userDoctor.password);
+            if(!passValidation){
+                throw new Error();
+            }
+            req.session.uid = userDoctor._id;
+            res.status(200).send(userDoctor);
+        }else {
+            res.status(409).send({message: 'User does not exists!'});
+        }
+          
+    } catch (err) {
+        res.status(500).send(null)
+    }
+}
+
+exports.logout = (req,res) => {
+
+    req.session.destroy((error) => {
+        if (error) {
+          res
+            .status(500)
+            .send({ error, message: 'Could not log out, please try again' });
+        } else {
+          res.clearCookie('sid');
+          res.sendStatus(200);
+        }
+    });
 }
 
 //get patient by id
@@ -51,16 +97,19 @@ exports.addPatient = async (req,res) => {
         let patientExist = false;
         const existingPatients = await db.Patients.findAll();
         for(patient of existingPatients){
-            if(patient.username === username){
+            if(patient.email === email){
                 patientExist = true;
                 break;
             }
         }
         if(patientExist){
             //if user already exist, we will respond to the request with a null answer
-            res.status(200).send()
+            res.status(409).send({message: 'User already exists!'});
         } else {
-            const patient = await db.Patients.create({name,age,email,username,password,stripeid,location,peerid})
+            //10 stands for number of times the password will be encrypted. More encryption times = more secure, but also more slower too.
+            const hashPass = await bcrypt.hash(password,10);
+            const patient = await db.Patients.create({name,age,email,username,password:hashPass,stripeid,location,peerid});
+            req.session.uid = patient._id;
             res.status(200).send(patient);
         }
 
@@ -79,7 +128,7 @@ exports.addDoctor = async (req,res) => {
         let doctorExists = false;
         const existingDoctors = await db.Doctors.findAll();
         for(doctor of existingDoctors){
-            if(doctor.username === username){
+            if(doctor.email === email){
 
                 doctorExists = true;
                 break;
@@ -88,9 +137,11 @@ exports.addDoctor = async (req,res) => {
         if(doctorExists){
             //if user already exist, we will respond to the request with a null answer
             console.log('doctor exists');
-            res.status(200).send(null);
+            res.status(409).send({message: 'User already exists!'});
         } else {
-            const doctor = await db.Doctors.create({name: name,age: age,workyears: workyears,email: email,username: username,password: password,specialty: specialty,location: location, priceonsite: priceonsite,priceremote: priceremote,peerid: peerid});
+            const hashPass = await bcrypt.hash(password,10);
+            const doctor = await db.Doctors.create({name: name,age: age,workyears: workyears,email: email,username: username,password: hashPass,specialty: specialty,location: location, priceonsite: priceonsite,priceremote: priceremote,peerid: peerid});
+            req.session.uid = doctor._id;
             res.status(200).send(doctor);
         }
 

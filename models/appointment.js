@@ -24,6 +24,10 @@ module.exports = (sequelize, DataTypes) => {
         price: {
             type: DataTypes.FLOAT,
             allowNull: false,
+        },
+        location: {
+            type: DataTypes.GEOMETRY('POINT', 4326),
+            allowNull: true
         }
     });
 

@@ -12,6 +12,8 @@ import Grid from '@mui/material/Grid';
 import LockOutlinedIcon from '@mui/icons-material/LockOutlined';
 import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
+import { useHistory } from 'react-router-dom'
+import { useUser } from '../context/UserContext';
 
 function Copyright(props) {
   return (
@@ -29,6 +31,11 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function SignInSide() {
+
+  let history = useHistory();
+
+  const {setUserAuth} = useUser();
+
   const handleSubmit = (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -37,6 +44,8 @@ export default function SignInSide() {
       email: data.get('email'),
       password: data.get('password'),
     });
+    setUserAuth(true);
+    history.push("/home");
   };
 
   return (

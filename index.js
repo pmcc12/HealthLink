@@ -9,21 +9,38 @@ const io = require('socket.io')(server,{
 }); // we give our server object to the socket.io library knows our server when where we are listening
 const cors = require('cors');
 const bodyParser = require('body-parser');
+const session = require('express-session');
+const cookieParser = require('cookie-parser')
 const db = require('./models/model')
 const router = require('./router');
 require('dotenv').config(); 
 
-const {devPORT} = process.env || 5000;
+const {devPORT, SESS_SECRET} = process.env || 5000;
 
-console.log(process.env);
+console.log(SESS_SECRET);
 
 app.use(cors());
 app.use(bodyParser.json())
+   .use(cookieParser())
+   .use(session({
+       //this middleware will create a session object and attach it to the request
+       //name that will appear in the browser dev-tool (session name)
+       name: 'sid',
+       saveUninitialized: false,
+       resave: false,
+       secret: SESS_SECRET,
+       cookie: {
+           maxAge: 1000 * 60 * 60, //1 hour session
+           sameSite: true,
+           httpOnly:false,
+           secure: false
+       },
+   }))
    .use(router);
 
    
    (async function bootstrap() {
-       //    await db.sequelize.sync({force:true}); drop all tables and create again
+        //   await db.sequelize.sync({force:true}); //drop all tables and create again
        await db.sequelize.sync();
        //as soon we receive an incoming http request from a client, we want immediatly to handover him a socket and start listening (maybe it has safety loop)
        io.on('connection', (socket) => {

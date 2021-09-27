@@ -17,6 +17,10 @@ router.get('/patient/:id', controller.getPatient)
 // get a doctor by id
 router.get('/doctor/:id', controller.getDoctor)
 
+router.post('/login', controller.login);
+
+router.post('/logout', controller.logout);
+
 // get all doctors
 router.get('/doctors', controller.getAllDoctors)
 
