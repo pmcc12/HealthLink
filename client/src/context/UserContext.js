@@ -20,6 +20,7 @@ export const UserContextProvider = ({children}) => {
     const [userName, setUserName] = useState('');
     const [userAge, setUserAge] = useState(0);
     const [geolocation, setGeolocation] = useState({});
+    const [userRadius, setUserRadius] = useState(2);
     const [peerId, setPeerId] = useState('');
     
     //patient user specific info
@@ -30,9 +31,10 @@ export const UserContextProvider = ({children}) => {
     const [priceRemote, setPriceRemote] = useState(0);
     const [priceOnSite, setPriceOnSite] = useState(0);
     const [workYears, setWorkYears] = useState(0);
+    const [onSiteAvailability, setOnSiteAvailability] = useState(false);
 
     //all doctors request
-    const [doctors, setDoctors] = useState([])
+    const [doctorsGeoJSON, setDoctorsGeoJSON] = useState({})
 
     //appointment specific data
     const [appointmentDoctor, setAppointmentDoctor] = useState({});
@@ -42,18 +44,25 @@ export const UserContextProvider = ({children}) => {
     const [location, setLocation] = useState({});
     const [priceMeeting, setPriceMeeting] = useState(0);
     const [roomId, setRoomId] = useState('')
-       
+    
+    //http request status code
+    const  reqStatus = useRef(0);
+
     //context is created so that children components at any point can access to state and inner methods
     
     // useEffect(() => {
         
     // }, [])
 
-    //when we want try a call, we need to have the callee id (id)
+    //when we want try a call, we neede to have the callee id (id)
 
     const createUser = () => {
+
+        console.log('inside user!');
+
         if(isDoctor){
-            fetch(`http://localhost:8080/doctor`,{
+            console.log('i am a doc!');
+            return fetch(`${process.env.REACT_APP_HOST}/doctor`,{
                 method: "POST",
                 credentials: 'include',
                 mode: 'cors',
@@ -64,6 +73,7 @@ export const UserContextProvider = ({children}) => {
                     name: userName,
                     age: userAge,
                     workyears: workYears,
+                    onsiteavailability: onSiteAvailability,
                     email: userEmail,
                     password: password,
                     specialty: specialty,
@@ -73,10 +83,26 @@ export const UserContextProvider = ({children}) => {
                     peerid: peerId
                 })
             })
-            .then(res => res.json())
-            .then(data => setUser(data))
+            .then(res => {
+                reqStatus.current = res.status;
+                return res.json()
+            })
+            .then(data => {
+                console.log(data);
+                if(reqStatus.current === 200){
+                    setUser(data)
+                    return true;
+                } else {
+                    return false
+                }
+            })
+            .catch(err => {
+                console.log(err);
+                return false;
+            })
         }else {
-            fetch(`http://localhost:8080/patient`,{
+            console.log("i am a patient!");
+            return fetch(`${process.env.REACT_APP_HOST}/patient`,{
                 method: "POST",
                 credentials: 'include',
                 mode: 'cors',
@@ -86,32 +112,43 @@ export const UserContextProvider = ({children}) => {
                 body: JSON.stringify({
                     name: userName,
                     age: userAge,
-                    workyears: workYears,
                     email: userEmail,
                     password: password,
-                    specialty: specialty,
-                    location: geolocation,
-                    priceremote: priceRemote,
-                    priceonsite: priceOnSite,
-                    peerid: peerId
                 })
             })
-            .then(res => res.json())
-            .then(data => setUser(data))
+            .then(res => {
+                reqStatus.current = res.status;
+                return res.json()
+            })
+            .then(data => {
+                if(reqStatus.current === 200){
+                    console.log(data);
+                    setUser(data)
+                    return true;
+                } else {
+                    return false
+                }
+            })
+            .catch(err => {
+                console.log(err);
+                return false;
+            })
         }
     }
 
     const getAllDoctors = () => {
-        fetch(`http://localhost:8080/doctors`)
+        fetch(`${process.env.REACT_APP_HOST}/doctors`)
         .then(res => {
-            console.log(res.headers);
-            res.json()})
-        .then(data => setDoctors(data))
+            console.log('my headers',res.headers);
+            return res.json()})
+        .then(data => {
+            console.log('my geojson: ',data);
+            setDoctorsGeoJSON(data)})
         .catch(err => console.log(err));
     }
 
     const Login = () => {
-        fetch(`http://localhost:8080/login`,{
+        return fetch(`${process.env.REACT_APP_HOST}/login`,{
             method: "POST",
             headers: {
                 'content-type': 'application/json'
@@ -121,12 +158,34 @@ export const UserContextProvider = ({children}) => {
                 password: password
             })
         })
-        .then(res => res.json())
-        .then(data => setUser(data))
+        .then(res => {
+            console.log('response status: ',res.status);
+            reqStatus.current = res.status;
+            return res.json();
+        })
+        .then(data => {
+            console.log('mydata VALUE: ',data);
+            console.log('my status VALUE:', reqStatus);
+            console.log('is doctor?@usercontext:',data.isdoctor);
+            setUser(data);
+            setIsDoctor(data.isdoctor);
+            if(reqStatus.current === 200){
+                console.log('user authorized from usercontext');
+                return true;
+            } else {
+                console.log('not authorized on usercontext',reqStatus)
+                return false;
+            }
+        })
+        .catch(err => {
+            console.log('error: ',err);
+            return false;
+        });
+        console.log('i am here?');
     }
 
     const Logout = () => {
-        fetch(`http://localhost:8080/logout`,{
+        fetch(`${process.env.REACT_APP_HOST}/logout`,{
             method: "POST",
             headers: {
                 'content-type': 'application/json'
@@ -137,7 +196,7 @@ export const UserContextProvider = ({children}) => {
     }
 
     const createAppointment = () => {
-        fetch(`http://localhost:8080/doctor`,{
+        fetch(`${process.env.REACT_APP_HOST}/doctor`,{
             method: "POST",
             credentials: 'include',
             mode: 'cors',
@@ -158,10 +217,10 @@ export const UserContextProvider = ({children}) => {
         })
         .then(res => res.json())
         .then(data => setUser(data))
-    }
+    } 
 
     return (
-        <UserContext.Provider value={{userAuth,setUserAuth,user,setUser,userRegistered,setUserRegistered,isDoctor,setIsDoctor,userId,setUserId,userEmail,setUserEmail,setPassword,userName,setUserName,userAge,setUserAge,geolocation,setGeolocation,peerId,setPeerId,stripeId,setStripeId,specialty,setSpecialty,priceRemote,setPriceRemote,priceOnSite,setPriceOnSite,workYears,setWorkYears}}>
+        <UserContext.Provider value={{userAuth,setUserAuth,user,setUser,userRegistered,setUserRegistered,isDoctor,setIsDoctor,userId,setUserId,userEmail,setUserEmail,setPassword,userName,setUserName,userAge,setUserAge,geolocation,setGeolocation,peerId,setPeerId,stripeId,setStripeId,specialty,setSpecialty,priceRemote,setPriceRemote,priceOnSite,setPriceOnSite,workYears,setWorkYears, createAppointment,Login,Logout, getAllDoctors,createUser,onSiteAvailability, setOnSiteAvailability, userRadius, setUserRadius,doctorsGeoJSON, setDoctorsGeoJSON}}>
             {children}
         </UserContext.Provider>
     )
@@ -225,4 +284,4 @@ export const useUser = () => {
 //       .then((res) => res.json())
 //       .catch((err) => console.log(err));
 //     // REMOVE-END
-//   };
+//   }

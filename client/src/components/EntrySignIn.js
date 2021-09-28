@@ -34,9 +34,23 @@ export default function SignInSide() {
 
   let history = useHistory();
 
-  const {setUserAuth} = useUser();
+  const {setPassword,setUserEmail,setUserAuth, Login, user,getAllDoctors} = useUser();
 
-  const handleSubmit = (event) => {
+  const handleRegister = () => {
+    history.push("/register");
+  }
+
+  const handleUserEmail = (event) => {
+    console.log(event.target.value);
+    setUserEmail(event.target.value)
+  }
+
+  const handleUserPass = (event) => {
+    console.log(event.target.value);
+    setPassword(event.target.value);
+  }
+
+  const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
     // eslint-disable-next-line no-console
@@ -44,8 +58,14 @@ export default function SignInSide() {
       email: data.get('email'),
       password: data.get('password'),
     });
-    setUserAuth(true);
-    history.push("/home");
+    let validLogin = await Login();
+    if(validLogin){
+      await getAllDoctors()
+      console.log('userauth set to true');
+      setUserAuth(true);
+    }
+    console.log('valid login: ',validLogin )
+    history.push("/");
   };
 
   return (
@@ -83,6 +103,7 @@ export default function SignInSide() {
             </Typography>
             <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
               <TextField
+                onChange={handleUserEmail}
                 margin="normal"
                 required
                 fullWidth
@@ -93,6 +114,7 @@ export default function SignInSide() {
                 autoFocus
               />
               <TextField
+                onChange={handleUserPass}
                 margin="normal"
                 required
                 fullWidth
@@ -115,13 +137,13 @@ export default function SignInSide() {
                 Sign In
               </Button>
               <Grid container>
-                <Grid item xs>
+                {/* <Grid item xs>
                   <Link href="#" variant="body2">
                     Forgot password?
                   </Link>
-                </Grid>
+                </Grid> */}
                 <Grid item>
-                  <Link href="#" variant="body2">
+                  <Link variant="body2" onClick={handleRegister}>
                     {"Don't have an account? Sign Up"}
                   </Link>
                 </Grid>

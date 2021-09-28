@@ -4,12 +4,15 @@ import SignInSide from './components/EntrySignIn';
 import Home from './components/Home';
 import SignUp from './components/SignUp'
 import { useUser } from './context/UserContext';
+import MarkerMap from './components/MarkerMap';
+import AppointmentsVisualizor from './components/VisualizeAppointments';
+import AppointmentCreator from './components/NewAppointment';
 
 // import myMap from './components/Map';
 
 const App = () => {
 
-  const {userAuth} = useUser();
+  const {userAuth, Logout} = useUser();
 
   return (
     <div className="App">
@@ -18,7 +21,9 @@ const App = () => {
       <Switch>
         <Route exact path="/login" component={SignInSide}/>
         <Route exact path="/register" component={SignUp}/>
-        <Route exact path="/home" component={()=><Home authorization={userAuth}/>}/>
+        <Route exact path="/new" component={()=><AppointmentCreator authorization={userAuth}/>}/>
+        <Route exact path="/check" component={()=><AppointmentsVisualizor authorization={userAuth}/>}/>
+        <Route exact path="/" component={()=><Home authorization={userAuth}/>}/>
       </Switch>
     </Router>
 

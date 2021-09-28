@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         age: {
             type: DataTypes.FLOAT,
-            allowNull:true
+            allowNull:false
         },
         workyears: {
             type: DataTypes.FLOAT,
@@ -28,7 +28,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         username: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
         },
         password: {
             type: DataTypes.STRING,
@@ -42,19 +42,29 @@ module.exports = (sequelize, DataTypes) => {
             type: DataTypes.GEOMETRY('POINT', 4326),
             allowNull: false
         },
+        radius: {
+            // field:'price_remote',
+            type: DataTypes.FLOAT,
+            allowNull: true
+        },
         priceremote: {
             // field:'price_remote',
             type: DataTypes.FLOAT,
             allowNull: false
         },
+        onsiteavailability: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: true,
+            allowNull: false
+        },
         priceonsite: {
             // field:'price_on_site',
             type: DataTypes.FLOAT,
-            allowNull: false
+            allowNull: true
         },
         peerid: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: true
         }
     });
 

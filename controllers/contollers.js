@@ -7,7 +7,32 @@ exports.getAllDoctors = async (req,res) => {
         console.log('welcome to getAlldoctors');
         const allDoctors = await db.Doctors.findAll();
 
-        res.status(200).send(allDoctors);
+        //i need all doctors in a GeoJson Format
+        let geoJsonDoctors = {
+            type: "FeatureCollection",
+            features: []
+        }
+        for(doctor of allDoctors){
+            let feature = {type:"Feature",properties:{},geometry:{}};
+            feature.properties = {
+                id: doctor.id,
+                name: doctor.name,
+                email: doctor.email,
+                age: doctor.age,
+                specialty:doctor.specialty,
+                onsiteavailability: doctor.onsiteavailability,
+                priceremote: doctor.priceremote,
+                priceonsite: doctor.priceonsite,
+                peerid: doctor.peerid,
+                radius: doctor.radius,
+                workyears: doctor.workyears,
+                isdoctor: doctor.isdoctor
+            }
+            feature.geometry = doctor.location; 
+            geoJsonDoctors.features.push(feature);
+        }
+
+        res.status(200).send(geoJsonDoctors);
 
     } catch(err){
         res.status(500).send('Error!');
@@ -16,9 +41,9 @@ exports.getAllDoctors = async (req,res) => {
 
 exports.login = async (req,res) => {
     try{
-        console.log('in login')
+        console.log('here!!')
         const {email, password} = req.body;
-        console.log(email,' ',password);
+        console.log('email: ',email,' || pass: ',password);
         const userPatient = await db.Patients.findOne({where:{ email: email }});
         console.log(userPatient)
         const userDoctor = await db.Doctors.findOne({where:{ email: email }});
@@ -26,6 +51,7 @@ exports.login = async (req,res) => {
         if (userPatient){
             const passValidation = await bcrypt.compare(password,userPatient.password);
             if(!passValidation){
+                console.log('shit, bad pass');
                 throw new Error();
             }
             req.session.uid = userPatient._id;
@@ -33,6 +59,7 @@ exports.login = async (req,res) => {
         }else if(userDoctor){
             const passValidation = await bcrypt.compare(password,userDoctor.password);
             if(!passValidation){
+                console.log('shit, bad pass');
                 throw new Error();
             }
             req.session.uid = userDoctor._id;
@@ -94,10 +121,12 @@ exports.addPatient = async (req,res) => {
     try {
         console.log('welcome to addPatient');
         let {name,age,email,username,password,stripeid,location,peerid} = req.body;
+        console.log(name,' ',age,' ',email,' ',password);
         let patientExist = false;
         const existingPatients = await db.Patients.findAll();
         for(patient of existingPatients){
             if(patient.email === email){
+                console.log('patient exists')
                 patientExist = true;
                 break;
             }
@@ -108,7 +137,9 @@ exports.addPatient = async (req,res) => {
         } else {
             //10 stands for number of times the password will be encrypted. More encryption times = more secure, but also more slower too.
             const hashPass = await bcrypt.hash(password,10);
-            const patient = await db.Patients.create({name,age,email,username,password:hashPass,stripeid,location,peerid});
+            console.log(hashPass);
+            const patient = await db.Patients.create({name,age,email,password:hashPass});
+            console.log(patient);
             req.session.uid = patient._id;
             res.status(200).send(patient);
         }
@@ -122,7 +153,7 @@ exports.addPatient = async (req,res) => {
 exports.addDoctor = async (req,res) => {
     try {
         console.log('welcome to addDoctor');
-        let {name,age,workyears,email,username,password,specialty,location,priceremote,priceonsite,peerid} = req.body;
+        let {name,age,workyears,email,username,password,specialty,location,priceremote,priceonsite,peerid, onsiteavailability} = req.body;
 
         console.log(location.type);
         let doctorExists = false;
@@ -140,7 +171,7 @@ exports.addDoctor = async (req,res) => {
             res.status(409).send({message: 'User already exists!'});
         } else {
             const hashPass = await bcrypt.hash(password,10);
-            const doctor = await db.Doctors.create({name: name,age: age,workyears: workyears,email: email,username: username,password: hashPass,specialty: specialty,location: location, priceonsite: priceonsite,priceremote: priceremote,peerid: peerid});
+            const doctor = await db.Doctors.create({name: name,age: age,workyears: workyears,email: email,username: username,password: hashPass,specialty: specialty,location: location, priceonsite: priceonsite,priceremote: priceremote,peerid: peerid, onsiteavailability: onsiteavailability});
             req.session.uid = doctor._id;
             res.status(200).send(doctor);
         }
@@ -181,6 +212,26 @@ exports.getDoctorAppointments = async (req,res) => {
                 required: true
             }],
             where: { DoctorId: req.params.id }
+        });
+    
+        res.status(200).send(doctorAppointments)
+    } catch (err) {
+        console.log('error! : ',err);
+        res.status(500).send(err);
+    }
+}
+
+exports.getPatientAppointments = async (req,res) => {
+    try {
+        console.log('welcome to getDoctor: ',req.params.id);
+        //attributes = SELECT
+        const doctorAppointments = await db.Appointments.findAll({ 
+            attributes: ['date','DoctorId','price','onsiteappointment','remoteappointment'],
+            include: [{
+                model: db.Patients,
+                required: true
+            }],
+            where: { PatientId: req.params.id }
         });
     
         res.status(200).send(doctorAppointments)

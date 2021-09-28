@@ -11,6 +11,9 @@ router.get('/',(req,res) => {
 // get doctor appointments
 router.get('/doctor/:id/appointments', controller.getDoctorAppointments);
 
+// get patient appointments
+router.get('/patient/:id/appointments', controller.getPatientAppointments)
+
 // get a patient by id
 router.get('/patient/:id', controller.getPatient)
 

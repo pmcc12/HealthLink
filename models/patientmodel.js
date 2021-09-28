@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         age: {
             type: DataTypes.FLOAT,
-            allowNull:true
+            allowNull:false
         },
         email: {
             type: DataTypes.STRING,
@@ -24,7 +24,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         username: {
             type: DataTypes.STRING,
-            allowNull: false,
+            allowNull: true,
         },
         password: {
             type: DataTypes.STRING,
@@ -40,7 +40,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         peerid: {
             type: DataTypes.STRING,
-            allowNull: false
+            allowNull: true
         }
     });
 

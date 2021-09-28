@@ -15,11 +15,18 @@ const db = require('./models/model')
 const router = require('./router');
 require('dotenv').config(); 
 
+const corsConfig = {
+    // REMOVE-START
+    origin: 'http://localhost:3000',
+    credentials: true,
+    // REMOVE-END
+  };
+
 const {devPORT, SESS_SECRET} = process.env || 5000;
 
 console.log(SESS_SECRET);
 
-app.use(cors());
+app.use(cors(corsConfig));
 app.use(bodyParser.json())
    .use(cookieParser())
    .use(session({
