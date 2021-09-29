@@ -33,8 +33,8 @@ export const UserContextProvider = ({children}) => {
     const [priceOnSite, setPriceOnSite] = useState(0);
     const [workYears, setWorkYears] = useState(0);
     const [onSiteAvailability, setOnSiteAvailability] = useState(false);
-
-
+    
+    
     //appointment specific data
     const [appointmentDoctor, setAppointmentDoctor] = useState({});
     const [appointmentId, setAppointmentId] = useState('')
@@ -47,7 +47,8 @@ export const UserContextProvider = ({children}) => {
     //choosen doctor for meeting
     const [selectedDoctor, setSelectedDoctor] = useState({
         selected: false
-    });
+    });    
+
 
 
     //http request status code

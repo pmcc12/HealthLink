@@ -17,6 +17,7 @@
     "@testing-library/react": "^11.2.7",
     "@testing-library/user-event": "^12.8.3",
     "date-fns": "^2.24.0",
+    "date-fns-tz": "^1.1.6",
     "env-cmd": "^10.1.0",
     "leaflet": "^1.6.0",
     "leaflet-defaulticon-compatibility": "^0.1.1",

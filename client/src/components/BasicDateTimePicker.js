@@ -12,7 +12,6 @@ function BasicDateTimePicker({setSelectedDate, selectedDate}) {
 
   return (
     <MuiPickersUtilsProvider utils={DateFnsUtils}>
-      <Fragment>
         <DateTimePicker
           label="DateTimePicker"
           inputVariant="outlined"
@@ -21,7 +20,6 @@ function BasicDateTimePicker({setSelectedDate, selectedDate}) {
           onChange={handleDateChange}
           format="yyyy-MM-dd HH:mm:ss"
         />
-      </Fragment>
     </MuiPickersUtilsProvider>
   );
 }

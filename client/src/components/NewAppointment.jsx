@@ -1,5 +1,5 @@
 import React from "react";
-import {useRef, useState} from 'react'
+import {useRef, useState, useEffect} from 'react'
 import { Button, Container } from "@material-ui/core";
 import { CallContextProvider } from "../context/CallContext";
 import VideoChat from './VideoChat';
@@ -22,10 +22,12 @@ import { useHistory } from "react-router-dom";
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import Checkbox from '@mui/material/Checkbox';
+import { format } from 'date-fns-tz';
+
 
 
 const useStyles = makeStyles((theme) => ({
-    container: {
+  container: {
       width: '600px',
       margin: '35px 0',
       padding: 0,
@@ -40,23 +42,29 @@ const useStyles = makeStyles((theme) => ({
       fontWeight: "bold"
     }
   }));
-
-const AppointmentCreator = ({authorization}) => {
   
+  const AppointmentCreator = ({authorization}) => {
+    
     let history = useHistory();
-
+    
     const {selectedDoctor, setSelectedDoctor,remoteAppointment,setRemoteAppointment,dateAndTime,setDateAndTime} = useUser();
-
+    
     const [selectedDate, setSelectedDate] = useState(new Date());
-
-
+    let formattedDate = '';
+    console.log('@appointment creator: date: ', selectedDate);
+    
+    useEffect(() => {
+    console.log('newApp useeffect date: ',selectedDate)
+    formattedDate = format(selectedDate,'yyyy-MM-dd HH:mm');
+      
+    }, [selectedDate]);
     if(!authorization){
       console.log('not authorized!')
-        return <Redirect to="login"/>;
+      return <Redirect to="login"/>;
     }
-
+    
     const handleMeetingSubmit = () => {
-
+      
 
       history.push("/");
     }
@@ -102,16 +110,17 @@ const AppointmentCreator = ({authorization}) => {
                       marginTop: 3,
                       marginBottom: 3
                     }}>
-                      <BasicDateTimePicker setSelectedDate={setDateAndTime} selectedDate={selectedDate}/>   
+                      <BasicDateTimePicker setSelectedDate={setSelectedDate} selectedDate={selectedDate}/>   
                     </Grid>
+                    {}
                     <Typography>
-                        Your will be scheduled for: {dateAndTime} and the price will be {remoteAppointment ? selectedDoctor.priceremote : selectedDoctor.priceonsite}€
+                        Your will be scheduled for: {selectedDate.toDateString()}, at {selectedDate.toLocaleTimeString()} and the price will be {remoteAppointment ? selectedDoctor.priceremote : selectedDoctor.priceonsite}€
                     </Typography>
                     <Button onClick={handleMeetingSubmit} variant="contained">Confirm</Button>
                   </Box>  
                 </Grid>
                   
-                ):  null}
+                  ):  null}
             </Box>
         </Container>
         </div>
@@ -119,3 +128,5 @@ const AppointmentCreator = ({authorization}) => {
 }
 
 export default AppointmentCreator;
+
+// Outputs as "February 17, 2017"

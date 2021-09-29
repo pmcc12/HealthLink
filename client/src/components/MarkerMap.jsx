@@ -32,28 +32,33 @@ const MarkerMap = () => {
     
     const {geolocation, setGeolocation, userRadius, setUserRadius,isDoctor, setSelectedDoctor} = useUser();
     
+    const location = useGeoLocation();
+
+    const [doctorsGeoJSON, setdoctorsGeoJSON] = useState({});
+     
+    //location object never change.. otherwise will be a problem, only userLocation change
+    const userLocation = useRef({
+        lat: location.coordinates.lat,
+        lng: location.coordinates.lng
+    });
+    console.log('userLocation = ',userLocation);
+    console.log('location: ',location.available, ' location coords:', location.coordinates)
     // const [readyToRenderDoctor, setReadyToRenderDoctor] = useState(false);
     // const [readyToRenderPatient, setReadyToRenderPatient] = useState(false);
 
-    const [doctorsGeoJSON, setdoctorsGeoJSON] = useState({})
     const readyToRenderDoctor = useRef(false);
     const readyToRenderPatient = useRef(false);
 
     console.log('userRadius = ',userRadius);
     
     // const [appointmentCircle, setAppointmentCircle] = useState();
-    const location = useGeoLocation();
-     
-        //location object never change.. otherwise will be a problem, only userLocation change
-    const userLocation = useRef({
-        lat: location.coordinates.lat,
-        lng: location.coordinates.lng
-    });
-        
-    console.log('userLocation = ',userLocation);
-    console.log('location: ',location.available, ' location coords:', location.coordinates)
-
-        //I will mount one of two possible setups: Doctor setup (only one draggable marker with customizable radius) or User setup (several non-draggable markers representing doctors locations and its range radius)
+    
+    
+    //I will mount one of two possible setups: Doctor setup (only one draggable marker with customizable radius) or User setup (several non-draggable markers representing doctors locations and its range radius)
+    
+    useEffect(() => {
+        console.log('MOUNTING AGAIN!');
+    }, [])
 
     useEffect(() => {
         console.log('@useeffect location: ',location.available, ' location coords:', location.coordinates)
