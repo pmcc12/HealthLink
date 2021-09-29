@@ -1,6 +1,6 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 
-const UserContext = createContext();
+export const UserContext = createContext();
 
 
 //context will be available to all children who can have rights of access to calling data
@@ -25,6 +25,7 @@ export const UserContextProvider = ({children}) => {
     
     //patient user specific info
     const [stripeId, setStripeId] = useState('');
+    //this will be the doctor which the user selects for the appointment
     
     //doctor user specific info
     const [specialty, setSpecialty] = useState('');
@@ -33,8 +34,6 @@ export const UserContextProvider = ({children}) => {
     const [workYears, setWorkYears] = useState(0);
     const [onSiteAvailability, setOnSiteAvailability] = useState(false);
 
-    //all doctors request
-    const [doctorsGeoJSON, setDoctorsGeoJSON] = useState({})
 
     //appointment specific data
     const [appointmentDoctor, setAppointmentDoctor] = useState({});
@@ -45,6 +44,12 @@ export const UserContextProvider = ({children}) => {
     const [priceMeeting, setPriceMeeting] = useState(0);
     const [roomId, setRoomId] = useState('')
     
+    //choosen doctor for meeting
+    const [selectedDoctor, setSelectedDoctor] = useState({
+        selected: false
+    });
+
+
     //http request status code
     const  reqStatus = useRef(0);
 
@@ -80,7 +85,8 @@ export const UserContextProvider = ({children}) => {
                     location: geolocation,
                     priceremote: priceRemote,
                     priceonsite: priceOnSite,
-                    peerid: peerId
+                    peerid: peerId,
+                    radius: userRadius
                 })
             })
             .then(res => {
@@ -136,16 +142,18 @@ export const UserContextProvider = ({children}) => {
         }
     }
 
-    const getAllDoctors = () => {
-        fetch(`${process.env.REACT_APP_HOST}/doctors`)
-        .then(res => {
-            console.log('my headers',res.headers);
-            return res.json()})
-        .then(data => {
-            console.log('my geojson: ',data);
-            setDoctorsGeoJSON(data)})
-        .catch(err => console.log(err));
-    }
+    // const getAllDoctors = () => {
+    //      fetch(`${process.env.REACT_APP_HOST}/doctors`)
+    //     .then(res => {
+    //         console.log('my headers',res.headers);
+    //         return res.json()})
+    //     .then(data => {
+    //         console.log('my geojson: ',data);
+    //         // setDoctorsGeoJSON(data)}
+    //     }
+    //         )
+    //     .catch(err => console.log(err));
+    // }
 
     const Login = () => {
         return fetch(`${process.env.REACT_APP_HOST}/login`,{
@@ -220,7 +228,7 @@ export const UserContextProvider = ({children}) => {
     } 
 
     return (
-        <UserContext.Provider value={{userAuth,setUserAuth,user,setUser,userRegistered,setUserRegistered,isDoctor,setIsDoctor,userId,setUserId,userEmail,setUserEmail,setPassword,userName,setUserName,userAge,setUserAge,geolocation,setGeolocation,peerId,setPeerId,stripeId,setStripeId,specialty,setSpecialty,priceRemote,setPriceRemote,priceOnSite,setPriceOnSite,workYears,setWorkYears, createAppointment,Login,Logout, getAllDoctors,createUser,onSiteAvailability, setOnSiteAvailability, userRadius, setUserRadius,doctorsGeoJSON, setDoctorsGeoJSON}}>
+        <UserContext.Provider value={{userAuth,setUserAuth,user,setUser,userRegistered,setUserRegistered,isDoctor,setIsDoctor,userId,setUserId,userEmail,setUserEmail,setPassword,userName,setUserName,userAge,setUserAge,geolocation,setGeolocation,peerId,setPeerId,stripeId,setStripeId,specialty,setSpecialty,priceRemote,setPriceRemote,priceOnSite,setPriceOnSite,workYears,setWorkYears, createAppointment,Login,Logout,createUser,onSiteAvailability, setOnSiteAvailability, userRadius, setUserRadius, selectedDoctor, setSelectedDoctor,remoteAppointment,setRemoteAppointment,dateAndTime,setDateAndTime}}>
             {children}
         </UserContext.Provider>
     )
@@ -231,57 +239,3 @@ export const UserContextProvider = ({children}) => {
 export const useUser = () => {
     return useContext(UserContext);
 }
-
-// apiService.register = (user) => {
-//     // REMOVE-START
-//     return fetch(`${BASE_URL}/register`, {
-//       method: 'POST',
-//       credentials: 'include',
-//       mode: 'cors',
-//       headers: { 'Content-Type': 'application/json' },
-//       body: JSON.stringify(user),
-//     })
-//       .then((res) => res.json())
-//       .catch((err) => console.log(err));
-//     // REMOVE-END
-//   };
-  
-//   apiService.login = (user) => {
-//     // REMOVE-START
-//     return fetch(`${BASE_URL}/login`, {
-//       method: 'POST',
-//       credentials: 'include',
-//       mode: 'cors',
-//       headers: { 'Content-Type': 'application/json' },
-//       body: JSON.stringify(user),
-//     })
-//       .then((res) => res.json())
-//       .catch((err) => console.log(err));
-//     // REMOVE-END
-//   };
-  
-//   apiService.profile = () => {
-//     // REMOVE-START
-//     return fetch(`${BASE_URL}/me`, {
-//       method: 'GET',
-//       credentials: 'include',
-//       mode: 'cors',
-//       headers: { 'Content-Type': 'application/json' },
-//     })
-//       .then((res) => res.json())
-//       .catch((err) => console.log(err));
-//     // REMOVE-END
-//   };
-  
-//   apiService.logout = () => {
-//     // REMOVE-START
-//     return fetch(`${BASE_URL}/logout`, {
-//       method: 'POST',
-//       credentials: 'include',
-//       mode: 'cors',
-//       headers: { 'Content-Type': 'application/json' },
-//     })
-//       .then((res) => res.json())
-//       .catch((err) => console.log(err));
-//     // REMOVE-END
-//   }

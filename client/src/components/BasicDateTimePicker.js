@@ -1,35 +1,28 @@
 import React, { Fragment, useState } from "react";
-import { DateTimePicker } from "@material-ui/pickers";
+import { DateTimePicker, MuiPickersUtilsProvider } from "@material-ui/pickers";
+import DateFnsUtils from '@date-io/date-fns'; // choose your lib
 
-function BasicDateTimePicker() {
-  const [selectedDate, handleDateChange] = useState(new Date());
+
+function BasicDateTimePicker({setSelectedDate, selectedDate}) {
+
+  const handleDateChange = (date) => {
+    console.log(date);
+    setSelectedDate(date);
+  }
 
   return (
-    <Fragment>
-      <DateTimePicker
-        label="DateTimePicker"
-        inputVariant="outlined"
-        value={selectedDate}
-        onChange={handleDateChange}
-      />
-
-      <DateTimePicker
-        autoOk
-        ampm={false}
-        disableFuture
-        value={selectedDate}
-        onChange={handleDateChange}
-        label="24h clock"
-      />
-
-      <DateTimePicker
-        value={selectedDate}
-        disablePast
-        onChange={handleDateChange}
-        label="With Today Button"
-        showTodayButton
-      />
-    </Fragment>
+    <MuiPickersUtilsProvider utils={DateFnsUtils}>
+      <Fragment>
+        <DateTimePicker
+          label="DateTimePicker"
+          inputVariant="outlined"
+          minDate={new Date()}
+          value={selectedDate}
+          onChange={handleDateChange}
+          format="yyyy-MM-dd HH:mm:ss"
+        />
+      </Fragment>
+    </MuiPickersUtilsProvider>
   );
 }
 

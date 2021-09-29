@@ -153,7 +153,7 @@ exports.addPatient = async (req,res) => {
 exports.addDoctor = async (req,res) => {
     try {
         console.log('welcome to addDoctor');
-        let {name,age,workyears,email,username,password,specialty,location,priceremote,priceonsite,peerid, onsiteavailability} = req.body;
+        let {name,age,workyears,email,username,password,specialty,location,priceremote,priceonsite,peerid, onsiteavailability,radius} = req.body;
 
         console.log(location.type);
         let doctorExists = false;
@@ -171,7 +171,7 @@ exports.addDoctor = async (req,res) => {
             res.status(409).send({message: 'User already exists!'});
         } else {
             const hashPass = await bcrypt.hash(password,10);
-            const doctor = await db.Doctors.create({name: name,age: age,workyears: workyears,email: email,username: username,password: hashPass,specialty: specialty,location: location, priceonsite: priceonsite,priceremote: priceremote,peerid: peerid, onsiteavailability: onsiteavailability});
+            const doctor = await db.Doctors.create({name: name,age: age,workyears: workyears,email: email,username: username,password: hashPass,specialty: specialty,location: location, priceonsite: priceonsite,priceremote: priceremote,peerid: peerid, onsiteavailability: onsiteavailability, radius:radius});
             req.session.uid = doctor._id;
             res.status(200).send(doctor);
         }

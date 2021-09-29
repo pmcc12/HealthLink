@@ -23,6 +23,7 @@ const App = () => {
         <Route exact path="/register" component={SignUp}/>
         <Route exact path="/new" component={()=><AppointmentCreator authorization={userAuth}/>}/>
         <Route exact path="/check" component={()=><AppointmentsVisualizor authorization={userAuth}/>}/>
+        <Route exact path="/call" component={()=><AppointmentsVisualizor authorization={userAuth}/>}/>
         <Route exact path="/" component={()=><Home authorization={userAuth}/>}/>
       </Switch>
     </Router>

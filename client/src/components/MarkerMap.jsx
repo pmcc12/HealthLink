@@ -3,77 +3,94 @@ import 'leaflet/dist/leaflet.css';
 import 'leaflet-defaulticon-compatibility/dist/leaflet-defaulticon-compatibility.webpack.css'; // Re-uses images from ~leaflet package
 import * as L from 'leaflet';
 import 'leaflet-defaulticon-compatibility';
-import {Map, TileLayer, Marker, Popup} from 'react-leaflet'
+import {Map, TileLayer, Marker, Popup, Circle, Pane} from 'react-leaflet'
 import mockup from '../data/mockup.json'
 import useGeoLocation from '../hooks/useGeoLocation'
 import InputSlider from './SliderItem';
 import { useUser } from '../context/UserContext';
+import OutlinedCard from './Card';
+import { useContext } from 'react';
+import {UserContext} from '../context/UserContext';
+import { makeStyles } from '@material-ui/styles';
+import { display } from '@mui/system';
+import { Typography } from '@mui/material';
+
+const getAllDoctors = () => {
+    return fetch(`${process.env.REACT_APP_HOST}/doctors`)
+   .then(res => {
+       console.log('my headers',res.headers);
+       return res.json()})
+   .then(data => {
+       console.log('my geojson: ',data);
+       return data;
+       // setDoctorsGeoJSON(data)}
+   })
+   .catch(err => console.log(err));
+}
 
 const MarkerMap = () => {
     
-    const {geolocation, setGeolocation, userRadius, setUserRadius, doctorsGeoJSON,isDoctor,getAllDoctors} = useUser();
+    const {geolocation, setGeolocation, userRadius, setUserRadius,isDoctor, setSelectedDoctor} = useUser();
+    
+    // const [readyToRenderDoctor, setReadyToRenderDoctor] = useState(false);
+    // const [readyToRenderPatient, setReadyToRenderPatient] = useState(false);
+
+    const [doctorsGeoJSON, setdoctorsGeoJSON] = useState({})
+    const readyToRenderDoctor = useRef(false);
+    const readyToRenderPatient = useRef(false);
 
     console.log('userRadius = ',userRadius);
-
-    // const [appointmentCircle, setAppointmentCircle] = useState();
-    const appointmentCircle = useRef();
-    const location = useGeoLocation();
     
-    const mapRef = useRef();
-    // const [userSelectedRadius, setUserSelectedRadius] = useState(2);
-    // const [userLocation, setUserLocation] = useState({
-    //     lat: location.coordinates.lat,
-    //     lng: location.coordinates.lng
-    // })
-
-    //location object never change.. otherwise will be a problem, only userLocation change
+    // const [appointmentCircle, setAppointmentCircle] = useState();
+    const location = useGeoLocation();
+     
+        //location object never change.. otherwise will be a problem, only userLocation change
     const userLocation = useRef({
         lat: location.coordinates.lat,
         lng: location.coordinates.lng
+    });
         
-    })
-    
-    
-    console.log(location);
-    
-    //I will mount one of two possible setups: Doctor setup (only one draggable marker with customizable radius) or User setup (several non-draggable markers representing doctors locations and its range radius)
-    useEffect(() => {
-        console.log(geolocation);
+    console.log('userLocation = ',userLocation);
+    console.log('location: ',location.available, ' location coords:', location.coordinates)
 
-    }, [geolocation])
-    
+        //I will mount one of two possible setups: Doctor setup (only one draggable marker with customizable radius) or User setup (several non-draggable markers representing doctors locations and its range radius)
+
     useEffect(() => {
-        
+        console.log('@useeffect location: ',location.available, ' location coords:', location.coordinates)
+        console.log('inside useeffect!')
         console.log('useeffect: ',location.coordinates.lat,' ' ,location.coordinates.lng);
         if(location.coordinates.lat === '' && location.coordinates.lng === ''){
             return;
-        }
-        console.log('is a doctor?',isDoctor);
-        if(isDoctor){
-            createDoctorMarker();
         } else {
-            console.log('here in useffect again');
-            createUserMap();
+            userLocation.current = {
+                lat: location.coordinates.lat,
+                lng: location.coordinates.lng
+            };
+            console.log('user location on use effect ',userLocation.current);
+            getAllDoctors().then((data) => {
+                readyToRenderDoctor.current=true;
+                if(!data.type){
+                    console.log('GEOJSON IS NULL!!')
+                    return;
+                } else {
+                    console.log('DONE LETS GO!');
+                    console.log(data);
+                    readyToRenderPatient.current = true;
+                    setdoctorsGeoJSON(data);
+                }
+            })
         }
-        
     }, [location]);
-    
+                
+    // useEffect(() => {
+    // }, [doctorsGeoJSON]);
+
     const registerLocation = (event) => {
-        console.log('here!!!!!')
-        // userDesiredLocation.current = {
-            //     lat: event.target.getLatLng().lat,
-            //     lng: event.target.getLatLng().lng
-        // }
-        console.log('rL: ',event.target.getLatLng());
-        // setUserLocation({
-        //     lat: event.target.getLatLng().lat,
-        //     lng: event.target.getLatLng().lng
-        // })
         userLocation.current = {
             lat: event.target.getLatLng().lat,
             lng: event.target.getLatLng().lng
         };
-
+        
         setGeolocation({
             type: 'Point',
             coordinates: [event.target.getLatLng().lng,event.target.getLatLng().lat]
@@ -81,153 +98,76 @@ const MarkerMap = () => {
         // console.log(userLocation);
         console.log(userLocation.current);
         console.log('my geolocation',geolocation)
-        mobilizationRadiusChange(userRadius);
     }
-    
+                    
     const mobilizationRadiusChange = (newRadius) => {
-        console.log('inside mobilization');
-        const {current = {}} = mapRef;
-        const { leafletElement: map } = current;
-        // appointmentCircle.removeFrom(map);
-        appointmentCircle.current.removeFrom(map);
-
-        let appointmentZoneCircle = L.circle([userLocation.current.lat,userLocation.current.lng], {
-            radius: (newRadius*1000)
-        });
-        appointmentZoneCircle.addTo(map);
-        // setAppointmentCircle(appointmentZoneCircle);
-        appointmentCircle.current = appointmentZoneCircle;
         setUserRadius(newRadius);
-        console.log('radius=',userRadius);
     }
-    
-    const createUserMap = () => {
-        console.log(' i am a user! ');
 
-        const {current = {}} = mapRef;
-        // leafletElement let us interect with the map.. so i rename to map to be easier
-        const { leafletElement: map } = current;
+    const mouseOverHandler = () => {
+        console.log('mouse over');
+    }
 
-        if(!map){return;}
-
-        const geoJson = new L.GeoJSON(doctorsGeoJSON, {
-            onEachFeature: (feature = {}, layer) => {
-                // destructuring with default values in it's empty
-                const {properties = {}, geometry = {}} = feature;
-                const {coordinates} = geometry;
-                const {name, specialty, onsiteavailability, workyears, radius,age} = properties;
-            
-                let appointmentZoneCircle;
-            
-                if(onsiteavailability) {
-                    appointmentZoneCircle = L.circle(coordinates.reverse(), {
-                        radius: radius
-                    });
-                }
-            
-                const popup = L.popup();
-                const popopHtmlBuilder = `
-                    <div class="doctor-popup">
-                        <h3>Dr.${name}</h3>
-                        <ul>
-                            <li>
-                                <strong>Age</strong>: ${age} 
-                            </li>
-                            <li>
-                                <strong>On site appointment?</strong> ${onsiteavailability ? 'Yes' : 'No'}
-                            </li>
-                            <li>
-                                <strong>Specialty</strong>: ${specialty}
-                            </li>
-                            <li>
-                                <strong>work year</strong>: ${workyears}
-                            </li>
-                        <ul>
-                    </div>`;
-            
-                layer.on('mouseover',() => {
-                    if(onsiteavailability){
-                        appointmentZoneCircle.addTo(map)
-                    }
-                });
-            
-                layer.on('mouseout',() => {
-                    if(onsiteavailability){
-                        appointmentZoneCircle.removeFrom(map)
-                    }
-                })
-            
-                popup.setContent(popopHtmlBuilder);
-                layer.bindPopup(popup);
-            }
-        });
-        geoJson.addTo(map);
+    const mouseOutHandler = () => {
+        console.log('mouse out')
 
     }
 
-    const createDoctorMarker = () => {
-        console.log('i am a doctor!')
-        const {current = {}} = mapRef;
-        //leafletElement let us interect with the map.. so i rename to map to be easier
-        const { leafletElement: map } = current;    
-        
-        // setGeolocation({
-        //     type: 'Point',
-        //     coordinates: [location.coordinates.lat,location.coordinates.lng]
-        // })
-
-        console.log(location.coordinates.lng + ' and ' +location.coordinates.lat)
-        
-        console.log('geo location: ',geolocation);
-
-        const marker = L.marker([location.coordinates.lat,location.coordinates.lng], {
-            draggable:true,
-            title:"My root location"
+    const chooseDoctor = (user) => {
+        setSelectedDoctor({
+            selected: true,
+            name: user.name,
+            id: user.id,
+            specialty: user.specialty,
+            priceremote: user.priceremote,
+            priceonsite: user.priceonsite,
+            age: user.age
         })
-
-        // setUserLocation({
-        //     lat: location.coordinates.lat,
-        //     lng: location.coordinates.lng
-        // })
-        userLocation.current = {
-            lat: location.coordinates.lat,
-            lng: location.coordinates.lng
-        }
-      
-        let appointmentZoneCircle = L.circle([location.coordinates.lat,location.coordinates.lng], {
-            radius: (userRadius*1000)
-        });
-                    // appointmentZoneCircle.addTo(map);
-                    
-        appointmentZoneCircle.addTo(map);
-        // setAppointmentCircle(appointmentZoneCircle);
-        appointmentCircle.current = appointmentZoneCircle;
-        
-        
-        marker.bindPopup('Doctor place');
-        marker.addTo(map);
-        marker.on("dragend",(event) => registerLocation(event));
     }
-                
-                return(
-                    
-                    // <Map center={[37.02898610453314, -7.930217746614197]} zoom={12}>
-            
-                    // </Map>
-                    <>
-        <Map ref={mapRef} center={[location.coordinates.lat, location.coordinates.lng]} zoom={12}>
+
+    const createAppointment = () => {
+
+    }
+              
+    return(
+ 
+    <>
+        <Map  center={{lat: location.coordinates.lat, lng:location.coordinates.lng}} zoom={12}>
             <TileLayer 
             url={`https://api.mapbox.com/styles/v1/${process.env.REACT_APP_MAPBOX_USERID}/${process.env.REACT_APP_MAPBOX_STYLESID}/tiles/256/{z}/{x}/{y}@2x?access_token=${process.env.REACT_APP_MAPBOX_APIKEY}`}
             attribution="&copy; <a href=&quot;http://osm.org/copyright&quot;>OpenStreetMaps</a>"
             />
-            {/* <Marker position={[location.coordinates.lat, location.coordinates.lng]} draggable ondragend={(event) => registerLocation(event)}>
-                <Popup>
-                <b>{userSelectedRadius}</b>
-                </Popup>
-            </Marker> */}
+            
+            {console.log('my geo at marker:',doctorsGeoJSON)}
+            {isDoctor ? (
+                readyToRenderDoctor.current ? 
+                <Marker position={[userLocation.current.lat,userLocation.current.lng]} draggable ondragend={(event) => registerLocation(event)}>
+                    <Circle 
+                    center={{lat:userLocation.current.lat, lng: userLocation.current.lng}}
+                    fillColor="blue" 
+                    radius={userRadius*1000}/>
+                </Marker> : null
+            ): (readyToRenderPatient.current ? doctorsGeoJSON.features.map((feature) => (
+                
+                <Marker key={feature.properties.id} position={feature.geometry.coordinates.reverse()} onmouseover={mouseOverHandler} onmouseout={mouseOutHandler}>
+                    {console.log('my coordinates: ',feature.geometry.coordinates.reverse())}
+                   <Circle
+                    center={feature.geometry.coordinates.reverse()}
+                    fillColor="blue"
+                    fillOpacity="0"
+                    weight="0" 
+                    radius={1000*feature.properties.radius}/>
+                    <Popup>
+                        <OutlinedCard user={feature.properties} chooseDoctor={chooseDoctor}/>
+                    </Popup>
+                </Marker> 
+            
+            )) : null
+            )}
         </Map>
-        <InputSlider radiusChanger={mobilizationRadiusChange}/>
-        </>
+        {isDoctor ? <InputSlider radiusChanger={mobilizationRadiusChange}/> : null}
+
+    </>
     );
 }
 

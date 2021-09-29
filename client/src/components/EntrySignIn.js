@@ -60,7 +60,6 @@ export default function SignInSide() {
     });
     let validLogin = await Login();
     if(validLogin){
-      await getAllDoctors()
       console.log('userauth set to true');
       setUserAuth(true);
     }

@@ -28,6 +28,7 @@ const useGeoLocation = () => {
 
     useEffect(() => {
         //if browser doesn't support geolocation
+        console.log('useefect inside usegeolocation hook');
         if(!navigator.geolocation){
             setUserLocation(prevState => ({
                 ...prevState,
