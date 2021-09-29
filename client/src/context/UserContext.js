@@ -204,8 +204,9 @@ export const UserContextProvider = ({children}) => {
         .then(data => console.log(data))
     }
 
-    const createAppointment = () => {
-        fetch(`${process.env.REACT_APP_HOST}/doctor`,{
+    const createAppointment = (appointmentDateAndTime) => {
+        console.log('lets fetch appointments')
+        fetch(`${process.env.REACT_APP_HOST}/appointment`,{
             method: "POST",
             credentials: 'include',
             mode: 'cors',
@@ -214,14 +215,13 @@ export const UserContextProvider = ({children}) => {
             },
             body: JSON.stringify({
                 PatientId: userId,
-                DoctorId: appointmentDoctor._id,
+                DoctorId: selectedDoctor.id,
                 remoteappointment: remoteAppointment,
                 onsiteappointment: !remoteAppointment,
-                date: dateAndTime,
+                date: appointmentDateAndTime,
                 location: geolocation,
-                price: priceMeeting,
-                priceonsite: priceOnSite,
-                roomid: roomId
+                price: remoteAppointment ? selectedDoctor.priceremote : selectedDoctor.priceonsite,
+                priceonsite: selectedDoctor.priceonsite,
             })
         })
         .then(res => res.json())

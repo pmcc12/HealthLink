@@ -42,13 +42,7 @@ const Home = ({authorization}) => {
     const {user,isDoctor} = useUser();
     const classes = useStyles();
     
-    const [videoCall, setvideoCall] = useState(false);
     
-    const toggle = () => {
-      const buffer = videoCall;
-      setvideoCall(!buffer);
-      console.log(videoCall);
-    } ;
     
     if(!authorization){
       console.log('not authorized!')

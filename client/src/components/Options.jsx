@@ -1,7 +1,6 @@
 import React, {useState} from 'react';
 import { Button, TextField, Grid, Typography, Container, Paper } from '@material-ui/core';
-import { CopyToClipboard } from 'react-copy-to-clipboard';
-import { Assignment, Phone, PhoneDisabled } from '@material-ui/icons';
+import { Phone, PhoneDisabled } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/core/styles';
 import { useCall } from '../context/CallContext';
 
@@ -51,12 +50,6 @@ const useStyles = makeStyles((theme) => ({
                         <Grid item xs={12} md={6} className={classes.padding}>
                             <Typography gutterBottom variant="h6">Account Info</Typography>
                             <TextField label="Name" value={name} onChange={(event) => setName(event.target.value)}/>
-                            {console.log(me)}
-                            {/* <CopyToClipboard text={me} className={classes.margin}>
-                                <Button variant="container" color="primary" fullWidth startIcon={<Assignment fontSize="large"/>}>
-                                    Copy your ID
-                                </Button>
-                            </CopyToClipboard> */}
                         </Grid>
                         <Grid item xs={12} md={6} className={classes.padding}>
                             <Typography gutterBottom variant="h6">Make a Call</Typography>

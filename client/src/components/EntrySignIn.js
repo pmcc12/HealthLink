@@ -41,29 +41,20 @@ export default function SignInSide() {
   }
 
   const handleUserEmail = (event) => {
-    console.log(event.target.value);
     setUserEmail(event.target.value)
   }
 
   const handleUserPass = (event) => {
-    console.log(event.target.value);
     setPassword(event.target.value);
   }
 
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
-    // eslint-disable-next-line no-console
-    console.log({
-      email: data.get('email'),
-      password: data.get('password'),
-    });
     let validLogin = await Login();
     if(validLogin){
-      console.log('userauth set to true');
       setUserAuth(true);
     }
-    console.log('valid login: ',validLogin )
     history.push("/");
   };
 
@@ -136,11 +127,6 @@ export default function SignInSide() {
                 Sign In
               </Button>
               <Grid container>
-                {/* <Grid item xs>
-                  <Link href="#" variant="body2">
-                    Forgot password?
-                  </Link>
-                </Grid> */}
                 <Grid item>
                   <Link variant="body2" onClick={handleRegister}>
                     {"Don't have an account? Sign Up"}

@@ -47,11 +47,12 @@ const useStyles = makeStyles((theme) => ({
     
     let history = useHistory();
     
-    const {selectedDoctor, setSelectedDoctor,remoteAppointment,setRemoteAppointment,dateAndTime,setDateAndTime} = useUser();
+    const {selectedDoctor, setSelectedDoctor,remoteAppointment,setRemoteAppointment, createAppointment} = useUser();
     
     const [selectedDate, setSelectedDate] = useState(new Date());
     let formattedDate = '';
     console.log('@appointment creator: date: ', selectedDate);
+    console.log('@appointment creator: selected doctor',selectedDoctor)
     
     useEffect(() => {
     console.log('newApp useeffect date: ',selectedDate)
@@ -63,9 +64,11 @@ const useStyles = makeStyles((theme) => ({
       return <Redirect to="login"/>;
     }
     
+    //will handle the request to call
     const handleMeetingSubmit = () => {
       
-
+      //we might need to pass some data to the create appointment
+      createAppointment(selectedDate);
       history.push("/");
     }
 
@@ -112,7 +115,6 @@ const useStyles = makeStyles((theme) => ({
                     }}>
                       <BasicDateTimePicker setSelectedDate={setSelectedDate} selectedDate={selectedDate}/>   
                     </Grid>
-                    {}
                     <Typography>
                         Your will be scheduled for: {selectedDate.toDateString()}, at {selectedDate.toLocaleTimeString()} and the price will be {remoteAppointment ? selectedDoctor.priceremote : selectedDoctor.priceonsite}€
                     </Typography>

@@ -129,10 +129,6 @@ const MarkerMap = () => {
             age: user.age
         })
     }
-
-    const createAppointment = () => {
-
-    }
               
     return(
  

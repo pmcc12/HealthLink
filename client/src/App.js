@@ -4,12 +4,10 @@ import SignInSide from './components/EntrySignIn';
 import Home from './components/Home';
 import SignUp from './components/SignUp'
 import { useUser } from './context/UserContext';
-import MarkerMap from './components/MarkerMap';
 import AppointmentsVisualizor from './components/VisualizeAppointments';
 import AppointmentCreator from './components/NewAppointment';
 import CallRoom from './components/CallRoom';
 
-// import myMap from './components/Map';
 
 const App = () => {
 
