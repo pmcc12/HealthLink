@@ -7,6 +7,7 @@ import { useUser } from './context/UserContext';
 import MarkerMap from './components/MarkerMap';
 import AppointmentsVisualizor from './components/VisualizeAppointments';
 import AppointmentCreator from './components/NewAppointment';
+import CallRoom from './components/CallRoom';
 
 // import myMap from './components/Map';
 
@@ -23,7 +24,7 @@ const App = () => {
         <Route exact path="/register" component={SignUp}/>
         <Route exact path="/new" component={()=><AppointmentCreator authorization={userAuth}/>}/>
         <Route exact path="/check" component={()=><AppointmentsVisualizor authorization={userAuth}/>}/>
-        <Route exact path="/call" component={()=><AppointmentsVisualizor authorization={userAuth}/>}/>
+        <Route exact path="/call" component={()=><CallRoom />}/>
         <Route exact path="/" component={()=><Home authorization={userAuth}/>}/>
       </Switch>
     </Router>

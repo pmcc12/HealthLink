@@ -41,10 +41,12 @@ const useStyles = makeStyles((theme) => ({
     }
   }));
 
-const callRoom = ({authorization}) => {
+const CallRoom = () => {
   
     let history = useHistory();
-    
+
+    const classes = useStyles();
+
     const [videoCall, setvideoCall] = useState(false);
     
     const toggle = () => {
@@ -53,10 +55,10 @@ const callRoom = ({authorization}) => {
       console.log(videoCall);
     } ;
 
-    if(!authorization){
-      console.log('not authorized!')
-        return <Redirect to="/"/>;
-    }
+    // if(!authorization){
+    //   console.log('not authorized!')
+    //     return <Redirect to="/"/>;
+    // }
 
     const handleMeetingSubmit = () => {
 
@@ -64,13 +66,13 @@ const callRoom = ({authorization}) => {
       history.push("/");
     }
 
-    const handleClick = () => {
-      setRemoteAppointment(!remoteAppointment);
-    }
+    // const handleClick = () => {
+    //   setRemoteAppointment(!remoteAppointment);
+    // }
 
     return (
         <div>
-             <Button onClick={toggle}>toggle videochat</Button> 
+             <Button onClick={toggle}>Start Call</Button> 
              <Container>
              {videoCall ? (
                              <CallContextProvider>
@@ -82,10 +84,9 @@ const callRoom = ({authorization}) => {
                            ) : null}
              </Container>
              <Container className={classes.container}>
-               <MarkerMap />
              </Container>
         </div>
     )
 }
 
-export default AppointmentCreator;
+export default CallRoom;
