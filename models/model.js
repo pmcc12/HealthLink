@@ -1,5 +1,5 @@
 const fs = require('fs');
-const {DB_PORT, DB_NAME, DB_USER, DB_PASSWORD} = process.env;
+const { DB_NAME, DB_USER, DB_PASSWORD} = process.env;
 const Sequelize = require('sequelize');
 const { Model } = require('sequelize');
 const path = require('path'); //builtin in node. help us to get the specific path to this file
@@ -9,8 +9,17 @@ const config = {
     dialect: 'postgres'
 }
 
-const sequelize = new Sequelize('healthdb','pmcc12','somepassword12',config); //creating a sequelize instance
-const db = {}; //empty object initialization
+
+const sequelize = new Sequelize(DB_NAME, DB_USER , DB_PASSWORD, config); 
+
+ 
+ sequelize.authenticate().then( console.log('Connection has been established successfully.'))
+ .catch(error => console.error('Unable to connect to the database:', error))
+   
+    
+  
+
+const db = {}; 
 const files = fs.readdirSync(__dirname); //asking node to give us a list of the files in the current folder ('models' in this case and will be an array of strings)
 
 //we going to grab each file from the list of files @models folder
@@ -33,5 +42,6 @@ for(const model in db){
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
+
 
 module.exports = db;
