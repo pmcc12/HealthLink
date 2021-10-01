@@ -1,3 +1,4 @@
+require('dotenv').config(); 
 const express = require('express');
 const app = express(); // express object created
 const server = require('http').createServer(app); // http server object created (remark: only created, but hasn't started yet.. this will be only done with the server.listen())
@@ -13,7 +14,6 @@ const session = require('express-session');
 const cookieParser = require('cookie-parser')
 const db = require('./models/model')
 const router = require('./router');
-require('dotenv').config(); 
 
 const corsConfig = {
     // REMOVE-START
