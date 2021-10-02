@@ -1,5 +1,5 @@
 module.exports = (sequelize, DataTypes) => {
-    const Doctor = sequelize.define('Doctors',{
+    const Doctor = sequelize.define('Doctors', {
         id: {
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
@@ -16,7 +16,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         age: {
             type: DataTypes.FLOAT,
-            allowNull:false
+            allowNull: false
         },
         workyears: {
             type: DataTypes.FLOAT,
@@ -36,7 +36,7 @@ module.exports = (sequelize, DataTypes) => {
         },
         specialty: {
             type: DataTypes.STRING,
-            allowNull:false
+            allowNull: false
         },
         location: {
             type: DataTypes.GEOMETRY('POINT', 4326),
@@ -69,7 +69,7 @@ module.exports = (sequelize, DataTypes) => {
     });
 
     Doctor.associate = db => {
-        db.Doctors.belongsToMany(db.Patients, {through: "Appointments"});
+        db.Doctors.belongsToMany(db.Patients, { through: "Appointments" });
         // db.Doctors.(db.Appointments, {foreignKey: "Appointments"});
 
     }

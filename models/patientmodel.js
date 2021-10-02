@@ -1,3 +1,5 @@
+//patient and doctor should be the same or extend the same model.
+
 module.exports = (sequelize, DataTypes) => {
     const Patient = sequelize.define('Patients',{
         id: {

@@ -11,14 +11,14 @@ import CallRoom from './components/CallRoom';
 
 const App = () => {
 
-  const {userAuth, Logout} = useUser();
+  const {userAuth, Logout, handleLogIn} = useUser();
 
   return (
     <div className="App">
-     
+
     <Router>
       <Switch>
-        <Route exact path="/login" component={SignInSide}/>
+        <Route exact path="/login" component={()=><SignInSide handleLogIn={handleLogIn}/>}/>
         <Route exact path="/register" component={SignUp}/>
         <Route exact path="/new" component={()=><AppointmentCreator authorization={userAuth}/>}/>
         <Route exact path="/check" component={()=><AppointmentsVisualizor authorization={userAuth}/>}/>
