@@ -22,7 +22,6 @@ const corsConfig = {
 };
 
 const { devPORT, SESS_SECRET } = process.env || 8080;
-
 console.log(SESS_SECRET);
 
 app.use(cors(corsConfig));

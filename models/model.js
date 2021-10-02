@@ -1,17 +1,16 @@
 const fs = require('fs');
-const { DB_NAME, DB_USER, DB_PASSWORD } = process.env;
+const { DB_NAME, DB_USER, DB_PASSWORD, DB_NAME_TEST } = process.env;
 const Sequelize = require('sequelize');
-const { Model } = require('sequelize');
 const path = require('path'); //builtin in node. help us to get the specific path to this file
 
 const config = {
     host: 'localhost',
     dialect: 'postgres',
-    logging: false
+    logging: false,
 }
 
 
-const sequelize = new Sequelize(DB_NAME, DB_USER, DB_PASSWORD, config);
+const sequelize = new Sequelize(process.env.TESTING === 'TESTING' ? DB_NAME_TEST : DB_NAME, DB_USER, DB_PASSWORD, config);
 
 
 sequelize.authenticate().then(console.log('Connection has been established successfully.'))
@@ -43,6 +42,5 @@ for (const model in db) {
 
 db.sequelize = sequelize;
 db.Sequelize = Sequelize;
-
 
 module.exports = db;
