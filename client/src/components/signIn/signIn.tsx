@@ -1,18 +1,15 @@
 import {FC, ReactElement, useState, useCallback} from 'react';
-import {setUser,setIsDoctor,setUserAuth} from '../../context/UserContext';
-import {useHistory, Link} from 'react-router-dom';
-import logIn from '../../services/login.service';
+import {Link} from 'react-router-dom';
 
 
-
-
-const SignIn: FC = (props):ReactElement => {
+const SignIn: FC = (children:React.ReactNode):ReactElement => {
+  const {handleLogin} = children
   const [password, setPassword] = useState('');
   const [email, setEmail] = useState('');
 
   return (
     <div>
-      <form onSubmit={props.handleLogin}>
+      <form onSubmit={handleLogin}>
         <h2>Sign In</h2>
         <label></label>
         <input
@@ -30,7 +27,6 @@ const SignIn: FC = (props):ReactElement => {
           name="password"
           placeholder='Password'
           type="password"
-
           value={password}
           onChange={(e)=> setPassword(e.target.value)}
           required
