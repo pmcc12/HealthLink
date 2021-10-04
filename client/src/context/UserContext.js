@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import logIn from '../services/login.service.ts';
+import logOut from '../services/logout.service.ts'
 export const UserContext = createContext();
 
 
@@ -158,15 +159,14 @@ export const UserContextProvider = ({children}) => {
         };
     }
 
-    const Logout = () => {
-        fetch(`${process.env.REACT_APP_HOST}/logout`,{
-            method: "POST",
-            headers: {
-                'content-type': 'application/json'
-            }
-        })
-        .then(res => res.json())
-        .then(data => console.log(data))
+    async function handleLogOut(){
+      try{
+        await logOut()
+        setUserAuth(false);
+        setUser({})
+      }catch(err) {
+        console.log(err)
+      }
     }
 
     const createAppointment = (appointmentDateAndTime) => {
@@ -228,7 +228,7 @@ export const UserContextProvider = ({children}) => {
             setWorkYears,
             createAppointment,
             handleLogIn,
-            Logout,
+            handleLogOut,
             createUser,
             onSiteAvailability,
             setOnSiteAvailability,

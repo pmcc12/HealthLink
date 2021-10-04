@@ -7,7 +7,7 @@ import Options from './Options';
 import Notifications from './Notification';
 import MarkerMap from "./MarkerMap";
 import { makeStyles } from '@material-ui/core/styles';
-import { Redirect } from 'react-router-dom' 
+import { Redirect } from 'react-router-dom'
 import { useUser } from "../context/UserContext";
 import ButtonAppBar from "./ButtonAppBar";
 import { Box } from "@mui/system";
@@ -17,6 +17,7 @@ import { Typography } from "@mui/material";
 import { AppBar } from "@mui/material";
 import OutlinedCard from "./Card";
 import {useHistory} from 'react-router-dom'
+import NavBar from './NavBar/NavBar'
 
 const useStyles = makeStyles((theme) => ({
     container: {
@@ -36,14 +37,14 @@ const useStyles = makeStyles((theme) => ({
   }));
 
 const Home = ({authorization}) => {
-  
+
     let history = useHistory();
 
     const {user,isDoctor} = useUser();
     const classes = useStyles();
-    
-    
-    
+
+
+
     if(!authorization){
       console.log('not authorized!')
         return <Redirect to="login"/>;
@@ -61,8 +62,9 @@ const Home = ({authorization}) => {
 
     return (
         <div>
-          <ButtonAppBar />
-          
+          {/* <ButtonAppBar /> */}
+          <NavBar />
+
           <Container component="main" maxWidth="md">
             <Box
               sx={{
@@ -73,7 +75,7 @@ const Home = ({authorization}) => {
                 alignItems: 'center',
               }}
             >
-              
+
               <Button variant="contained">Visualize my Appointments</Button>
               { isDoctor ? null : <Button variant="contained" onClick={createNewAppointement}>Create a new    Appointment</Button>
               }
@@ -86,7 +88,7 @@ const Home = ({authorization}) => {
                   flexDirection: 'row',
                   alignItems: 'center',
                 }}
-                > 
+                >
                   <AddCircleOutlineIcon color="primary"/>
                   <Typography color="primary" className={classes.mycard}>
                     Create a new Appointement
@@ -101,7 +103,7 @@ const Home = ({authorization}) => {
                   flexDirection: 'row',
                   alignItems: 'center',
                 }}
-                > 
+                >
                   <AddCircleOutlineIcon color="primary"/>
                   <Typography color="primary" className={classes.mycard}>
                     Create a new Appointement
@@ -116,7 +118,7 @@ const Home = ({authorization}) => {
 
 export default Home;
             // {user.name}
-            // <Button onClick={toggle}>toggle videochat</Button> 
+            // <Button onClick={toggle}>toggle videochat</Button>
             // <Container>
             // {videoCall ? (
             //                 <CallContextProvider>

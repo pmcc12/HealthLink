@@ -1,0 +1,13 @@
+.navbar {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  background-color: royalblue;
+  color: white;
+  height: 50px;
+  padding: 0 20px;
+}
+
+.logout {
+  cursor: pointer;
+}
