@@ -1,6 +1,5 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import logIn from '../services/login.service.ts';
-import { useHistory } from 'react-router-dom';
 export const UserContext = createContext();
 
 
@@ -12,7 +11,6 @@ export const UserContextProvider = ({children}) => {
     const [userAuth, setUserAuth] = useState(false);
 
     //General user information
-    const history = useHistory()
     const [user, setUser] = useState({});
     const [userRegistered, setUserRegistered] = useState(true);
     const [isDoctor, setIsDoctor] = useState(false);
@@ -146,14 +144,14 @@ export const UserContextProvider = ({children}) => {
         }
     }
 
-    async function handleLogIn(email,password){
+    async function handleLogIn(email,password,redirect){
         try{
            const user = await logIn(email,password)
            if(user){
                setUser(user);
                setIsDoctor(user.isdoctor);
                setUserAuth(true);
-               history.push('/')
+                redirect()
             }
         }catch(err){
             console.log('error: ',err);
