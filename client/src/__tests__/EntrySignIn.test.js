@@ -12,6 +12,7 @@ describe('sign in component', () => {
     );
     expect(container.firstChild).toMatchSnapshot();
   });
+  
   test('email and password should be present on form',()=>{
     render(
       <UserContextProvider>
@@ -21,6 +22,7 @@ describe('sign in component', () => {
     screen.getByTestId('email-input');
     screen.getByTestId('password');
   } );
+  
   test('should not be able to attempt sign in if password or email are blank', ()=> {
     // const spy = jest.spyOn(SignInSide,'handleSubmit');
     render(
@@ -35,6 +37,7 @@ describe('sign in component', () => {
     userEvent.click(screen.getByText('Sign In'));
     expect(screen.getByRole('button').onSubmit).toHaveBeenCalledTimes(0);
   });
+  
   test('sign up link takes you to sign up page',()=> {
     render(
       <UserContextProvider>

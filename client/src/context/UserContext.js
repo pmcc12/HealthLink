@@ -1,5 +1,5 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
-import logIn from '../services/login.service';
+import logIn from '../services/login.service.ts';
 import { useHistory } from 'react-router-dom';
 export const UserContext = createContext();
 
@@ -45,7 +45,7 @@ export const UserContextProvider = ({children}) => {
     const [location, setLocation] = useState({});
     const [priceMeeting, setPriceMeeting] = useState(0);
     const [roomId, setRoomId] = useState('')
-    
+
 
     //choosen doctor for meeting
     const [selectedDoctor, setSelectedDoctor] = useState({
@@ -157,7 +157,6 @@ export const UserContextProvider = ({children}) => {
             }
         }catch(err){
             console.log('error: ',err);
-            return false;
         };
     }
 

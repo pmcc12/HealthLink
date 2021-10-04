@@ -1,11 +1,14 @@
-import {FC, ReactElement, useState, useCallback} from 'react';
-import {Link} from 'react-router-dom';
+import { FunctionComponent, useState } from "react";
+import { Link } from "react-router-dom";
 
+interface SignInProps {
+  handleLogin: () => void;
+}
 
-const SignIn: FC = (children:React.ReactNode):ReactElement => {
-  const {handleLogin} = children
-  const [password, setPassword] = useState('');
-  const [email, setEmail] = useState('');
+const SignIn: FunctionComponent<SignInProps> = ({ handleLogin }) => {
+  // const {handleLogin} = children
+  const [password, setPassword] = useState("");
+  const [email, setEmail] = useState("");
 
   return (
     <div>
@@ -15,29 +18,29 @@ const SignIn: FC = (children:React.ReactNode):ReactElement => {
         <input
           key="email"
           name="email"
-          placeholder='Email Address'
+          placeholder="Email Address"
           type="text"
           value={email}
-          onChange={(e)=> setEmail(e.target.value)}
+          onChange={(e) => setEmail(e.target.value)}
           required
         />
         <label></label>
         <input
           key="password"
           name="password"
-          placeholder='Password'
+          placeholder="Password"
           type="password"
           value={password}
-          onChange={(e)=> setPassword(e.target.value)}
+          onChange={(e) => setPassword(e.target.value)}
           required
         />
-        <button
-        />
-        <span ><Link to="/register">Don't have an account? Sign Up</Link></span>
+        <button />
+        <span>
+          <Link to="/register">Don't have an account? Sign Up</Link>
+        </span>
       </form>
-
     </div>
-  )
-}
+  );
+};
 
-export default SignIn
+export default SignIn;

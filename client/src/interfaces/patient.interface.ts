@@ -10,6 +10,6 @@ interface iPatient{
   stripeid:string,
   location: any,
   peerid: string
-}
+};
 
-export default iPatient
+export default iPatient;
