@@ -1,6 +1,7 @@
 import { FunctionComponent, useState } from "react";
 import { useHistory } from "react-router-dom";
 import { Link } from "react-router-dom";
+import Copyright from "../Copyright/Copyright"
 
 interface SignInProps {
   handleLogIn: (email: string, password: string, redirect: () => void) => void;
@@ -49,6 +50,7 @@ const SignIn: FunctionComponent<SignInProps> = ({ handleLogIn }) => {
           <Link to="/register">Don't have an account? Sign Up</Link>
         </span>
       </form>
+      <Copyright/>
     </div>
   );
 };
