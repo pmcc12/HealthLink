@@ -15,6 +15,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useHistory } from 'react-router-dom'
 import { useUser } from '../context/UserContext';
 
+//break out into it's own componenet
 function Copyright(props) {
   return (
     <Typography variant="body2" color="text.secondary" align="center" {...props}>
@@ -28,18 +29,23 @@ function Copyright(props) {
   );
 }
 
+
+//not needed part of materialize
 const theme = createTheme();
 
 export default function SignInSide() {
-
+  //refactor since this is not indirectly triggered and allow for easier testing
   let history = useHistory();
 
+  //remove unused variables, 
   const {setPassword,setUserEmail,setUserAuth, Login, user,getAllDoctors} = useUser();
 
   const handleRegister = () => {
+      //refactor since this is not indirectly triggered and allow for easier testing
     history.push("/register");
   }
 
+   //make email and userpassword use a single setter
   const handleUserEmail = (event) => {
     setUserEmail(event.target.value)
   }
@@ -47,7 +53,11 @@ export default function SignInSide() {
   const handleUserPass = (event) => {
     setPassword(event.target.value);
   }
+  //pull out of compoenent to make for easier testing. Remove unused variables
 
+  //create a login service and remove login from context
+  //login service takes email and password
+  //state or context remains responsible for holding email and password
   const handleSubmit = async (event) => {
     event.preventDefault();
     const data = new FormData(event.currentTarget);
@@ -91,9 +101,11 @@ export default function SignInSide() {
             <Typography component="h1" variant="h5">
               Sign in
             </Typography>
-            <Box component="form" noValidate onSubmit={handleSubmit} sx={{ mt: 1 }}>
+            {/* replace with form */}
+            <Box component="form" onSubmit={handleSubmit} sx={{ mt: 1 }}>
               <TextField
                 onChange={handleUserEmail}
+                // data-testid='email-input'
                 margin="normal"
                 required
                 fullWidth
@@ -102,7 +114,9 @@ export default function SignInSide() {
                 name="email"
                 autoComplete="email"
                 autoFocus
+                inputProps={{'data-testid':'email-input'}}
               />
+              {/* replace with input */}
               <TextField
                 onChange={handleUserPass}
                 margin="normal"
@@ -112,6 +126,7 @@ export default function SignInSide() {
                 label="Password"
                 type="password"
                 id="password"
+                inputProps={{'data-testid':'password'}}
                 autoComplete="current-password"
               />
               <FormControlLabel
