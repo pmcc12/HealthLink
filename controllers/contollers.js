@@ -54,7 +54,9 @@ exports.login = async (req,res) => {
                 console.log('shit, bad pass');
                 throw new Error();
             }
-            req.session.uid = userPatient._id;
+            //uid is the name we give to one of the properties of the session object. This property will have the session id
+            req.session.uid = userPatient.id;
+            console.log(req.session);
             res.status(200).send(userPatient);
         }else if(userDoctor){
             const passValidation = await bcrypt.compare(password,userDoctor.password);
@@ -62,7 +64,8 @@ exports.login = async (req,res) => {
                 console.log('shit, bad pass');
                 throw new Error();
             }
-            req.session.uid = userDoctor._id;
+            req.session.uid = userDoctor.id;
+            //cookie will be attached to the response object
             res.status(200).send(userDoctor);
         }else {
             res.status(409).send({message: 'User does not exists!'});
@@ -196,9 +199,63 @@ exports.addAppointment = async (req, res) => {
 
         res.status(200).send(appointement);
     } catch (err) {
-        console.log('error');
+        console.log(err);
         res.status(500).send(err);
     }
+}
+
+exports.deleteAppointment = async (req,res) => {
+    try {
+        console.log('here in delete')
+        const fb = await db.Appointments.destroy(
+            {where: { id: req.params.id }
+        })
+        if(fb === 1) res.status(200).send({status: true});
+        else res.status(200).send({status: false})
+    } catch (err) {
+        res.status(500).send(err);
+    }
+}
+
+exports.getAppointment = async (req,res) => {
+    try {
+        console.log('here in delete')
+        const appointment = await db.Appointments.findOne(
+            {where: { id: req.params.id }
+        });
+        res.status(200).send(appointment);
+    } catch (err) {
+        res.status(500).send(err);
+    }
+}
+
+exports.updateAppointmentPeer = async (req,res) => {
+    try{
+
+        console.log('Update Appointment id!')
+        const {peerIdDoctor, peerIdPatient} = req.body;
+        console.log('peerIdDoctor: ',peerIdDoctor);
+        console.log('peerIdPatient: ',peerIdPatient);
+        console.log(typeof peerIdPatient);
+        let appointmentObj = {};
+        if(peerIdDoctor){
+            console.log('is a doctor!')
+            appointmentObj = await db.Appointments.update({peeriddoctor: peerIdDoctor},{
+                where: { id: req.params.id }
+            });
+        }
+        if(peerIdPatient){
+            console.log('is a patient!')
+            appointmentObj = await db.Appointments.update({peeridpatient: peerIdPatient},{
+                where: { id: req.params.id }
+            });
+        }
+        console.log(appointmentObj);
+        res.status(200).send(appointmentObj);
+    } catch (err) {
+        res.status(500).send(err);
+    }
+
 }
 
 exports.getDoctorAppointments = async (req,res) => {
@@ -206,9 +263,9 @@ exports.getDoctorAppointments = async (req,res) => {
         console.log('welcome to getDoctor: ',req.params.id);
         //attributes = SELECT
         const doctorAppointments = await db.Appointments.findAll({ 
-            attributes: ['date','roomid'],
+            attributes: ['id','date','roomid','onsiteappointment','remoteappointment','peeridpatient'],
             include: [{
-                model: db.Doctors,
+                model: db.Patients,
                 required: true
             }],
             where: { DoctorId: req.params.id }
@@ -221,24 +278,55 @@ exports.getDoctorAppointments = async (req,res) => {
     }
 }
 
+exports.updateDoctorPeerID = async (req,res) => {
+    try{
+
+        const {peerid} = req.body;
+        console.log('my doctor id: ',req.params.id);
+        const doctor = await db.Doctors.update({peerid: peerid},{
+            where: { id: req.params.id }
+        });
+        console.log('my doctor follows');
+        console.log(doctor);
+        res.status(200);
+
+    } catch (err) {
+        console.log('error! : ',err);
+        res.status(500).send(err);
+    }
+}
+
 exports.getPatientAppointments = async (req,res) => {
     try {
         console.log('welcome to getDoctor: ',req.params.id);
         //attributes = SELECT
-        const doctorAppointments = await db.Appointments.findAll({ 
-            attributes: ['date','DoctorId','price','onsiteappointment','remoteappointment'],
+        const patientAppointments = await db.Appointments.findAll({ 
+            attributes: ['id','date','DoctorId','price','onsiteappointment','remoteappointment','peeriddoctor'],
             include: [{
-                model: db.Patients,
+                model: db.Doctors,
                 required: true
             }],
             where: { PatientId: req.params.id }
         });
     
-        res.status(200).send(doctorAppointments)
+        res.status(200).send(patientAppointments)
     } catch (err) {
         console.log('error! : ',err);
         res.status(500).send(err);
     }
+}
+
+exports.updatePatientPeerID = async (req, res) => {
+
+        const {peerid} = req.body;
+        console.log('my patient id: ',req.params.id);
+        console.log('my peer id: ', peerid);
+        const patient = await db.Patients.update({peerid: peerid},{
+            where: { id: req.params.id }
+        });
+        console.log('my patient follows');
+        console.log(patient);
+        res.status(200);
 }
 
 // start call - signalling events
@@ -256,7 +344,7 @@ exports.callHandshake = (req,res) => {
     io.on('connection', (socket) => {
         socket.emit('ownuser', socket.id); //as soon client makes a request to connect with the server, a socket is created, and here we handover this client socket.id with the emit() function
         
-        console.log('connection established');
+        console.log('connection established in controller');
 
         socket.on('disconnect',() => {
             console.log('disconnected');

@@ -24,24 +24,6 @@ import FormGroup from '@mui/material/FormGroup';
 import Checkbox from '@mui/material/Checkbox';
 import { format } from 'date-fns-tz';
 
-
-
-const useStyles = makeStyles((theme) => ({
-  container: {
-      width: '600px',
-      margin: '35px 0',
-      padding: 0,
-      [theme.breakpoints.down('xs')]: {
-        width: '80%',
-      }
-    },
-    mypaper: {
-      borderRadius: 10
-    },
-    mycard: {
-      fontWeight: "bold"
-    }
-  }));
   
   const AppointmentCreator = ({authorization}) => {
     
@@ -66,7 +48,6 @@ const useStyles = makeStyles((theme) => ({
     
     //will handle the request to call
     const handleMeetingSubmit = () => {
-      
       //we might need to pass some data to the create appointment
       createAppointment(selectedDate);
       history.push("/");

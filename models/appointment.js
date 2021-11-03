@@ -28,6 +28,14 @@ module.exports = (sequelize, DataTypes) => {
         location: {
             type: DataTypes.GEOMETRY('POINT', 4326),
             allowNull: true
+        },
+        peeriddoctor: {
+            type: DataTypes.STRING,
+            allowNull: true
+        },
+        peeridpatient: {
+            type: DataTypes.STRING,
+            allowNull: true
         }
     });
 

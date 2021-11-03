@@ -1,8 +1,9 @@
-import React, {useState} from 'react';
+import React, {useRef, useEffect} from 'react';
 import { Button, TextField, Grid, Typography, Container, Paper } from '@material-ui/core';
 import { Phone, PhoneDisabled } from '@material-ui/icons';
 import { makeStyles } from '@material-ui/core/styles';
 import { useCall } from '../context/CallContext';
+import { useHistory } from 'react-router-dom';
 
 const useStyles = makeStyles((theme) => ({
     root: {
@@ -35,11 +36,17 @@ const useStyles = makeStyles((theme) => ({
     },
   }));
 
-  const Options = ({children}) => {
-    const {me, callAccepted, name, setName, callEnded,endCall, callUser} = useCall();
-    //the id we want to call
-    const [idToCall, setIdToCall] = useState('');
+  const Options = ({children, callFunc, appointmentId, endMyCall}) => {
+    const {me, callAccepted, name, setName, callEnded,endCall, callUser, deleteAppointment,getAppointment} = useCall();
+
     const classes = useStyles();
+    
+    const hangUp = () => {
+      console.log('appointment id at options: ',appointmentId);
+      endCall();
+      deleteAppointment(appointmentId);
+      endMyCall();
+    }
 
     return(
         <Container className={classes.container}>
@@ -52,14 +59,12 @@ const useStyles = makeStyles((theme) => ({
                             <TextField label="Name" value={name} onChange={(event) => setName(event.target.value)}/>
                         </Grid>
                         <Grid item xs={12} md={6} className={classes.padding}>
-                            <Typography gutterBottom variant="h6">Make a Call</Typography>
-                            <TextField label="ID to Call" value={idToCall} onChange={(event) => setIdToCall(event.target.value)}/>
                             {callAccepted && !callEnded ? (
-                                <Button onClick={endCall} className={classes.margin} variant="contained" color="secondary" fullWidth startIcon={<PhoneDisabled fontSize="large"/>}>
+                                <Button onClick={hangUp} className={classes.margin} variant="contained" color="secondary" fullWidth startIcon={<PhoneDisabled fontSize="large"/>}>
                                     Hang Up
                                 </Button>
                             ) : (
-                                <Button onClick={() => callUser(idToCall)} className={classes.margin} variant="contained" color="primary" fullWidth startIcon={<Phone fontSize="large"/>}>
+                                <Button onClick={() => callFunc(callUser, getAppointment)} className={classes.margin} variant="contained" color="primary" fullWidth startIcon={<Phone fontSize="large"/>}>
                                     Call
                                 </Button>
                             )

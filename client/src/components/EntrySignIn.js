@@ -1,4 +1,5 @@
 import * as React from 'react';
+import { useState, useRef, useEffect } from 'react';
 import Avatar from '@mui/material/Avatar';
 import Button from '@mui/material/Button';
 import CssBaseline from '@mui/material/CssBaseline';
@@ -14,6 +15,7 @@ import Typography from '@mui/material/Typography';
 import { createTheme, ThemeProvider } from '@mui/material/styles';
 import { useHistory } from 'react-router-dom'
 import { useUser } from '../context/UserContext';
+import DraggableDialog from './LoginModal';
 
 function Copyright(props) {
   return (
@@ -31,7 +33,10 @@ function Copyright(props) {
 const theme = createTheme();
 
 export default function SignInSide() {
+  
 
+  const [statusCode, setStatusCode] = useState(localStorage.getItem('lastcode'));
+  const refCode = useRef(localStorage.getItem('lastcode'));
   let history = useHistory();
 
   const {setPassword,setUserEmail,setUserAuth, Login, user,getAllDoctors} = useUser();
@@ -50,15 +55,24 @@ export default function SignInSide() {
 
   const handleSubmit = async (event) => {
     event.preventDefault();
-    const data = new FormData(event.currentTarget);
-    let validLogin = await Login();
-    if(validLogin){
+    refCode.current = await Login();
+    if(refCode.current === 200){
       setUserAuth(true);
+    } else if (refCode.current === 409) {
+      setStatusCode(409);
+      //localstorage is needed due to the fact that when we attempt to access Home.jsx, we actually step out of Login screen and jump to Home screen. When the attempt is not authorized, then Home.jsx will route us back again to Login screen leading to the lost of the last state.. here is where localstorage comes in, to save this last state. This state is needed for the modals display
+      localStorage.setItem('lastcode',409);
+    } else {
+      setStatusCode(500);
+      localStorage.setItem('lastcode',500);
     }
     history.push("/");
   };
-
+  
   return (
+    <>
+    {+statusCode === 409 ? (<DraggableDialog status={+statusCode}/>) : (null)}
+    {+statusCode === 500 ? (<DraggableDialog status={+statusCode}/>) : (null)}
     <ThemeProvider theme={theme}>
       <Grid container component="main" sx={{ height: '100vh' }}>
         <CssBaseline />
@@ -74,7 +88,7 @@ export default function SignInSide() {
             backgroundSize: 'cover',
             backgroundPosition: 'center',
           }}
-        />
+          />
         <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
           <Box
             sx={{
@@ -84,7 +98,7 @@ export default function SignInSide() {
               flexDirection: 'column',
               alignItems: 'center',
             }}
-          >
+            >
             <Avatar sx={{ m: 1, bgcolor: 'primary.main' }}>
               <LockOutlinedIcon />
             </Avatar>
@@ -102,7 +116,7 @@ export default function SignInSide() {
                 name="email"
                 autoComplete="email"
                 autoFocus
-              />
+                />
               <TextField
                 onChange={handleUserPass}
                 margin="normal"
@@ -113,17 +127,17 @@ export default function SignInSide() {
                 type="password"
                 id="password"
                 autoComplete="current-password"
-              />
+                />
               <FormControlLabel
                 control={<Checkbox value="remember" color="primary" />}
                 label="Remember me"
-              />
+                />
               <Button
                 type="submit"
                 fullWidth
                 variant="contained"
                 sx={{ mt: 3, mb: 2 }}
-              >
+                >
                 Sign In
               </Button>
               <Grid container>
@@ -139,5 +153,6 @@ export default function SignInSide() {
         </Grid>
       </Grid>
     </ThemeProvider>
+    </>
   );
 }

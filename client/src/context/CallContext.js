@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useRef, useState } from "react";
 import {io} from 'socket.io-client'
 import Peer from 'simple-peer'
+import { useUser } from "./UserContext";
 
 const CallContext = createContext();
 
@@ -9,9 +10,9 @@ const CallContext = createContext();
 
 export const CallContextProvider = ({children}) => {
     
-    // const socket = io('http://localhost:8080/');
+    const {userId,isDoctor,appointmentId} = useUser();
 
-    
+    // const socket = io('http://localhost:8080/');
     const [socket] = useState(io('http://localhost:8080/'))
     const [stream, setStream] = useState(null);
     const [me, setMe] = useState('');
@@ -24,11 +25,11 @@ export const CallContextProvider = ({children}) => {
     const userVideo = useRef({}); //is a html video element with my video
     const connectionRef = useRef({}); //need a reference outside this function for when i want to destroy the call
     
+
     //context is created so that children components at any point can access to state and inner methods
     
     useEffect(() => {
         
-
         navigator.mediaDevices.getUserMedia({
             video: true,
             audio:true
@@ -63,7 +64,111 @@ export const CallContextProvider = ({children}) => {
                 signal
             });
         })
-    }, [])
+    }, []);
+
+    useEffect(() => {
+        if(isDoctor){
+            //me will be equal to '' by default on the beginning, therefore, and to avoid unnecessary queries to the DB, will only perform these time consuming operations, only when strictly necessary (i.e. when we have a actual socket peerid set)
+            if(me !== ''){
+                updateDoctorPeerId();
+                //emit to the other client that we're ready forthe call
+            }
+        } else {
+            if(me !== ''){
+                updatePatientPeerId();
+                //emit to other client that we're ready for the call
+            } 
+        }
+        updateAppointmentPeer();
+
+    }, [me])
+
+    const updateDoctorPeerId = () => {
+        console.log('going to fetch a doctor with userid: '+userId+' and a peerid: '+me);
+        return fetch(`${process.env.REACT_APP_HOST}/doctor/${userId}`, {
+            method: "PUT",
+            credentials: 'include',
+            mode: 'cors',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify({
+                peerid: me
+            })
+        })
+    }
+
+    const updatePatientPeerId = () => {
+        console.log('going to fetch a patient with userid: '+userId+' and a peerid: '+me);
+        return fetch(`${process.env.REACT_APP_HOST}/patient/${userId}`, {
+            method: "PUT",
+            credentials: 'include',
+            mode: 'cors',
+            headers: {
+                'content-type': 'application/json'
+            },
+            body: JSON.stringify({
+                peerid: me
+            })
+        })
+    }
+
+    const deleteAppointment = (appointmentId) => {
+        console.log('going to delete an appointment with id: '+appointmentId);
+        return fetch(`${process.env.REACT_APP_HOST}/appointment/${appointmentId}`, {
+            method: "DELETE",
+            credentials: 'include',
+            mode: 'cors',
+            headers: {
+                'content-type': 'application/json'
+            }
+        })
+    }
+
+    const getAppointment = (appointmentId) => {
+        console.log('going to GET an appointment with id: '+appointmentId);
+        return fetch(`${process.env.REACT_APP_HOST}/appointment/${appointmentId}`, {
+            method: "GET",
+            credentials: 'include',
+            mode: 'cors',
+            headers: {
+                'content-type': 'application/json'
+            }
+        })
+        .then(res => res.json());
+    }
+
+    const updateAppointmentPeer = () => {
+        console.log('update peer')
+        if(isDoctor){
+            console.log('i am a doctor')
+            return fetch(`${process.env.REACT_APP_HOST}/appointment/${appointmentId}`, {
+                method: "PUT",
+                credentials: 'include',
+                mode: 'cors',
+                headers: {
+                    'content-type': 'application/json'
+                },
+                body: JSON.stringify({
+                    peerIdDoctor: me,
+                })
+            })
+        } else {
+            console.log('i am a patient');
+            console.log('appointment id: ',appointmentId);
+            return fetch(`${process.env.REACT_APP_HOST}/appointment/${appointmentId}`, {
+                method: "PUT",
+                credentials: 'include',
+                mode: 'cors',
+                headers: {
+                    'content-type': 'application/json'
+                },
+                body: JSON.stringify({
+                    peerIdPatient: me
+                })
+            })
+        }
+    }
 
     //when we want try a call, we need to have the callee id (id)
     const callUser = (id) => {
@@ -124,7 +229,6 @@ export const CallContextProvider = ({children}) => {
 
         //callee attempts to establish p2p connection with caller.. only will be achieved after caller received the signalling data sent on line 92 via websockets
         calleePeer.signal(call.signal);
-
          //need a reference outside this function for when i want to destroy the call
         connectionRef.current = calleePeer;
     }
@@ -141,7 +245,7 @@ export const CallContextProvider = ({children}) => {
     }
 
     return (
-        <CallContext.Provider value={{call,callAccepted,callEnded,myVideo,userVideo,stream,name,setName,me,callUser,endCall,answerCall}}>
+        <CallContext.Provider value={{call,callAccepted,callEnded,myVideo,userVideo,stream,name,setName,me,callUser,endCall,answerCall,deleteAppointment, getAppointment}}>
             {children}
         </CallContext.Provider>
     )

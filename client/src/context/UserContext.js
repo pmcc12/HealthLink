@@ -36,31 +36,22 @@ export const UserContextProvider = ({children}) => {
     
     
     //appointment specific data
-    const [appointmentDoctor, setAppointmentDoctor] = useState({});
-    const [appointmentId, setAppointmentId] = useState('')
+    const [appointmentsUser, setAppointmentsUser] = useState([]);
     const [remoteAppointment, setRemoteAppointment] = useState(true);
     const [dateAndTime, setDateAndTime] = useState('');
     const [location, setLocation] = useState({});
     const [priceMeeting, setPriceMeeting] = useState(0);
-    const [roomId, setRoomId] = useState('')
+    const [appointmentId, setAppointmentId] = useState(null)
     
     //choosen doctor for meeting
     const [selectedDoctor, setSelectedDoctor] = useState({
         selected: false
     });    
 
-
+ 
 
     //http request status code
     const  reqStatus = useRef(0);
-
-    //context is created so that children components at any point can access to state and inner methods
-    
-    // useEffect(() => {
-        
-    // }, [])
-
-    //when we want try a call, we neede to have the callee id (id)
 
     const createUser = () => {
 
@@ -142,23 +133,11 @@ export const UserContextProvider = ({children}) => {
             })
         }
     }
-
-    // const getAllDoctors = () => {
-    //      fetch(`${process.env.REACT_APP_HOST}/doctors`)
-    //     .then(res => {
-    //         console.log('my headers',res.headers);
-    //         return res.json()})
-    //     .then(data => {
-    //         console.log('my geojson: ',data);
-    //         // setDoctorsGeoJSON(data)}
-    //     }
-    //         )
-    //     .catch(err => console.log(err));
-    // }
-
+    //very important to include the credentials: 'include' to grab the set-cookie from the response header and store it into the cookie store. 
     const Login = () => {
         return fetch(`${process.env.REACT_APP_HOST}/login`,{
             method: "POST",
+            credentials: 'include',
             headers: {
                 'content-type': 'application/json'
             },
@@ -171,6 +150,7 @@ export const UserContextProvider = ({children}) => {
             console.log('response status: ',res.status);
             reqStatus.current = res.status;
             return res.json();
+
         })
         .then(data => {
             console.log('mydata VALUE: ',data);
@@ -178,12 +158,17 @@ export const UserContextProvider = ({children}) => {
             console.log('is doctor?@usercontext:',data.isdoctor);
             setUser(data);
             setIsDoctor(data.isdoctor);
+            setUserId(data.id)
+            
             if(reqStatus.current === 200){
                 console.log('user authorized from usercontext');
-                return true;
+                return 200;
+            } else if (reqStatus.current === 409) {
+                console.log('not authorized due to unknown email',reqStatus)
+                return 409;
             } else {
-                console.log('not authorized on usercontext',reqStatus)
-                return false;
+                console.log('wrong password. not authenticated');
+                return 500;
             }
         })
         .catch(err => {
@@ -194,18 +179,21 @@ export const UserContextProvider = ({children}) => {
     }
 
     const Logout = () => {
-        fetch(`${process.env.REACT_APP_HOST}/logout`,{
+        return fetch(`${process.env.REACT_APP_HOST}/logout`,{
             method: "POST",
+            credentials: 'include',
+            mode: 'cors',
             headers: {
                 'content-type': 'application/json'
             }
         })
-        .then(res => res.json())
-        .then(data => console.log(data))
     }
 
     const createAppointment = (appointmentDateAndTime) => {
-        console.log('lets fetch appointments')
+        console.log('lets fetch appointments');
+        console.log(user);
+        console.log('and selected doctor id');
+        console.log(selectedDoctor.id);
         fetch(`${process.env.REACT_APP_HOST}/appointment`,{
             method: "POST",
             credentials: 'include',
@@ -214,8 +202,8 @@ export const UserContextProvider = ({children}) => {
                 'content-type': 'application/json'
             },
             body: JSON.stringify({
-                PatientId: userId,
-                DoctorId: selectedDoctor.id,
+                patient_id: userId,
+                doctor_id: selectedDoctor.id,
                 remoteappointment: remoteAppointment,
                 onsiteappointment: !remoteAppointment,
                 date: appointmentDateAndTime,
@@ -225,11 +213,34 @@ export const UserContextProvider = ({children}) => {
             })
         })
         .then(res => res.json())
-        .then(data => setUser(data))
+    }
+    
+    const getDoctorAppointments = () => {
+        
+        return fetch(`${process.env.REACT_APP_HOST}/doctor/${userId}/appointments`,{
+            method: "GET",
+            credentials: 'include',
+            mode: 'cors',
+            headers: {
+                'content-type': 'application/json'
+            }
+        })
+    }
+    
+    const getPatientAppointments = () => {
+        
+        return fetch(`${process.env.REACT_APP_HOST}/patient/${userId}/appointments`,{
+            method: "GET",
+            credentials: 'include',
+            mode: 'cors',
+            headers: {
+                'content-type': 'application/json'
+            }
+        })
     } 
 
     return (
-        <UserContext.Provider value={{userAuth,setUserAuth,user,setUser,userRegistered,setUserRegistered,isDoctor,setIsDoctor,userId,setUserId,userEmail,setUserEmail,setPassword,userName,setUserName,userAge,setUserAge,geolocation,setGeolocation,peerId,setPeerId,stripeId,setStripeId,specialty,setSpecialty,priceRemote,setPriceRemote,priceOnSite,setPriceOnSite,workYears,setWorkYears, createAppointment,Login,Logout,createUser,onSiteAvailability, setOnSiteAvailability, userRadius, setUserRadius, selectedDoctor, setSelectedDoctor,remoteAppointment,setRemoteAppointment,dateAndTime,setDateAndTime}}>
+        <UserContext.Provider value={{userAuth,setUserAuth,user,setUser,userRegistered,setUserRegistered,isDoctor,setIsDoctor,userId,setUserId,userEmail,setUserEmail,setPassword,userName,setUserName,userAge,setUserAge,geolocation,setGeolocation,peerId,setPeerId,stripeId,setStripeId,specialty,setSpecialty,priceRemote,setPriceRemote,priceOnSite,setPriceOnSite,workYears,setWorkYears, createAppointment,Login,Logout,createUser,onSiteAvailability, setOnSiteAvailability, userRadius, setUserRadius, selectedDoctor, setSelectedDoctor,remoteAppointment,setRemoteAppointment,dateAndTime,setDateAndTime, getPatientAppointments, getDoctorAppointments, appointmentsUser, setAppointmentsUser, appointmentId, setAppointmentId}}>
             {children}
         </UserContext.Provider>
     )

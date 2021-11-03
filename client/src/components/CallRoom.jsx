@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect } from "react";
 import {useRef, useState} from 'react'
 import { Button, Container } from "@material-ui/core";
 import { CallContextProvider } from "../context/CallContext";
@@ -18,74 +18,66 @@ import { AppBar } from "@mui/material";
 import OutlinedCard from "./Card";
 import Grid from '@mui/material/Grid';
 import BasicDateTimePicker from "./BasicDateTimePicker";
-import { useHistory } from "react-router-dom";
+import { useHistory, useLocation } from "react-router-dom";
 import FormControlLabel from '@mui/material/FormControlLabel';
 import FormGroup from '@mui/material/FormGroup';
 import Checkbox from '@mui/material/Checkbox';
+import Callmodal from "./CallModal";
 
-
-const useStyles = makeStyles((theme) => ({
-    container: {
-      width: '600px',
-      margin: '35px 0',
-      padding: 0,
-      [theme.breakpoints.down('xs')]: {
-        width: '80%',
-      }
-    },
-    mypaper: {
-      borderRadius: 10
-    },
-    mycard: {
-      fontWeight: "bold"
-    }
-  }));
 
 const CallRoom = () => {
   
     let history = useHistory();
+    let location = useLocation();
+    const {isDoctor} = useUser();
+    const myAppointment = useRef({})
 
-    const classes = useStyles();
-
-    const [videoCall, setvideoCall] = useState(false);
-    
-    const toggle = () => {
-      const buffer = videoCall;
-      setvideoCall(!buffer);
-      console.log(videoCall);
-    } ;
+    const [readyForCall, setReadyForCall] = useState(false);
 
     // if(!authorization){
     //   console.log('not authorized!')
     //     return <Redirect to="/"/>;
     // }
 
-    const handleMeetingSubmit = () => {
+    const callmyUser = async(callUser, getAppointment) => {
 
+      myAppointment.current = await getAppointment(location.state.appointment.id)
+      console.log(myAppointment)
+      if(isDoctor){
+        if(myAppointment.current.peeridpatient){
+          callUser(myAppointment.current.peeridpatient);
+        } else {
+          setReadyForCall(true);
+        }
+      } else {
+        if(myAppointment.current.peeriddoctor){
+          callUser(myAppointment.current.peeriddoctor);
+        } else {
+          console.log('will set to true the ready to call')
+          setReadyForCall(true);
+        }
+      }
 
-      history.push("/");
     }
 
-    // const handleClick = () => {
-    //   setRemoteAppointment(!remoteAppointment);
-    // }
+    const endMyCall = () => {
+      return <Redirect to="/"/>    
+    }
 
     return (
-        <div>
-             <Button onClick={toggle}>Start Call</Button> 
-             <Container>
-             {videoCall ? (
-                             <CallContextProvider>
-                             <VideoChat />
-                             <Options>
-                                 <Notifications />
-                             </Options>
-                             </CallContextProvider>
-                           ) : null}
-             </Container>
-             <Container className={classes.container}>
-             </Container>
-        </div>
+      <div>
+        {readyForCall ? (<Callmodal setReadyForCall={setReadyForCall}/>) : (null)}
+        <ButtonAppBar/>
+
+          <Container>
+            <CallContextProvider>
+              <VideoChat />          
+              <Options callFunc={callmyUser} appointmentId={location.state.appointment.id} endMyCall={endMyCall}>
+                <Notifications />
+              </Options>
+            </CallContextProvider>
+          </Container>
+      </div>
     )
 }
 

@@ -45,12 +45,17 @@ const Home = ({authorization}) => {
     
     
     if(!authorization){
-      console.log('not authorized!')
-        return <Redirect to="login"/>;
+      console.log('not authorized in Home!')
+        // return <Redirect to="login"/>;
+        history.push("/login")
+    } else {
+      //cleaning last code status (using local storage to save last code status, which will get lost due to the page reload in case in un-authorized access (last if -> history.push("/login")))
+      localStorage.removeItem('lastcode');
     }
 
-    const visualizeUserAppointments = () => {
 
+    const visualizeUserAppointments = () => {
+      history.push("/check")
     }
 
     const createNewAppointement =  () => {
@@ -74,40 +79,11 @@ const Home = ({authorization}) => {
               }}
             >
               
-              <Button variant="contained">Visualize my Appointments</Button>
-              { isDoctor ? null : <Button variant="contained" onClick={createNewAppointement}>Create a new    Appointment</Button>
+              <Button variant="contained" onClick={visualizeUserAppointments}>Visualize my Appointments</Button>
+              { isDoctor ? null : <Button variant="contained" onClick={createNewAppointement}>Create a new Appointment</Button>
               }
 
-              {/* <Paper className={classes.mypaper}>
-                <Box
-                sx={{
-                  marginTop: 2,
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}
-                > 
-                  <AddCircleOutlineIcon color="primary"/>
-                  <Typography color="primary" className={classes.mycard}>
-                    Create a new Appointement
-                  </Typography>
-                </Box>
-              </Paper> */}
-              {/* <Paper className={classes.mypaper}>
-                <Box
-                sx={{
-                  marginTop: 2,
-                  display: 'flex',
-                  flexDirection: 'row',
-                  alignItems: 'center',
-                }}
-                > 
-                  <AddCircleOutlineIcon color="primary"/>
-                  <Typography color="primary" className={classes.mycard}>
-                    Create a new Appointement
-                  </Typography>
-                </Box>
-              </Paper> */}
+              
             </Box>
         </Container>
         </div>
@@ -115,18 +91,3 @@ const Home = ({authorization}) => {
 }
 
 export default Home;
-            // {user.name}
-            // <Button onClick={toggle}>toggle videochat</Button> 
-            // <Container>
-            // {videoCall ? (
-            //                 <CallContextProvider>
-            //                 <VideoChat />
-            //                 <Options>
-            //                     <Notifications />
-            //                 </Options>
-            //                 </CallContextProvider>
-            //               ) : null}
-            // </Container>
-            // <Container className={classes.container}>
-            //   <MarkerMap />
-            // </Container>

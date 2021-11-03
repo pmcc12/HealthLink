@@ -148,7 +148,8 @@ const MarkerMap = () => {
                     fillColor="blue" 
                     radius={userRadius*1000}/>
                 </Marker> : null
-            ): (readyToRenderPatient.current ? doctorsGeoJSON.features.map((feature) => (
+            ): (
+                readyToRenderPatient.current ? doctorsGeoJSON.features.map((feature) => (
                 
                 <Marker key={feature.properties.id} position={feature.geometry.coordinates.reverse()} onmouseover={mouseOverHandler} onmouseout={mouseOutHandler}>
                     {console.log('my coordinates: ',feature.geometry.coordinates.reverse())}
@@ -164,7 +165,16 @@ const MarkerMap = () => {
                 </Marker> 
             
             )) : null
-            )}
+            )
+            }
+            {/* {isDoctor ? null : 
+            (
+            <Marker fillColor="red" position={{lat: location.coordinates.lat, lng:location.coordinates.lng}}>
+                <Popup>
+                    My position!       
+                </Popup>
+            </Marker>
+            )} */}
         </Map>
         {isDoctor ? <InputSlider radiusChanger={mobilizationRadiusChange}/> : null}
 
